@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using System.Threading;
-using System.IO;
-using System.Linq;
-using CSCore;
-using CSCore.SoundOut;
-using CSCore.CoreAudioAPI;
+using Un4seen.Bass;
 
 namespace SynthTest
 {
-	public partial class Form1 : Form, IWaveSource
+	public partial class Form1 : Form
 	{
-		//ISoundOut waveOut = new WaveOut(32);
-		ISoundOut waveOut = new WasapiOut(true, AudioClientShareMode.Shared, 1);
-		List<PianoKey> mixfreq = new List<PianoKey>();
-		double volValue = 0.01;
+		private const int sampleRateSec = 44100;
+		private const BASSFlag sampleTypeFlag = BASSFlag.BASS_DEFAULT;
+		
+		private int bassStream;
+		private List<PianoKey> mixfreq = new List<PianoKey>();
+		private double volValue = 0.01;
+		private int streamBufferSize;
+		
+		private STREAMPROC soundCreator;
 
 		//int[] basetable = new[] { 26200, 29400, 33000, 34900, 39200, 44000, 49525, 52400, 58800, 66000 };
 
@@ -25,15 +25,12 @@ namespace SynthTest
 		{
 			InitializeComponent();
 
-			using (var mmdeviceEnumerator = new MMDeviceEnumerator())
-			{
-				using (var mmdeviceCollection = mmdeviceEnumerator.EnumAudioEndpoints(DataFlow.Render, DeviceState.Active))
-				{
-					comboBox3.DataSource = mmdeviceCollection.ToList();
-					comboBox3.DisplayMember = "FriendlyName";
-					comboBox3.ValueMember = "DeviceID";
-				}
-			}
+			InitBass();
+			
+			// TODO
+//			comboBox3.DataSource = mmdeviceCollection.ToList();
+//			comboBox3.DisplayMember = "FriendlyName";
+//			comboBox3.ValueMember = "DeviceID";
 
 			SetStyle(ControlStyles.UserPaint, true);
 			SetStyle(ControlStyles.AllPaintingInWmPaint, true);
@@ -60,30 +57,47 @@ namespace SynthTest
 			PrecalcKeys();
 		}
 
+		private void InitBass()
+		{
+			Debug.Assert(Bass.BASS_Init(-1, sampleRateSec, BASSInit.BASS_DEVICE_DEFAULT | BASSInit.BASS_DEVICE_LATENCY, IntPtr.Zero));
+			BASS_INFO info = Bass.BASS_GetInfo();
+			streamBufferSize = info.minbuf;
+			Console.WriteLine($@"Minimal buffer size: {streamBufferSize}");
+			Debug.Assert(Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, streamBufferSize));
+			Debug.Assert(Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_UPDATEPERIOD, 1));
+
+			IntPtr pointer = new IntPtr();
+			soundCreator = GetSoundBytes;
+			bassStream = Bass.BASS_StreamCreate(sampleRateSec, 1, sampleTypeFlag, soundCreator, pointer);
+			Debug.Assert(bassStream != 0, "Stream creation failed.");
+        
+			// play
+			Debug.Assert(Bass.BASS_ChannelPlay(bassStream, false));
+		}
+
+		private void DisposeBass()
+		{
+			// free
+			Bass.BASS_StreamFree(bassStream);
+			Bass.BASS_Free();
+		}
+
 		public void AutoPlay()
 		{
-			SelectDevice((MMDevice)comboBox3.SelectedItem);
+//			SelectDevice((MMDevice)comboBox3.SelectedItem);
 		}
 
-		private void SelectDevice(MMDevice device)
-		{
-			waveOut?.Dispose();
-
-			var ws = new WasapiOut(true, AudioClientShareMode.Shared, 1) { Device = device };
-			waveOut = ws;
-			waveOut.Initialize(this);
-			waveOut.Play();
-		}
+//		private void SelectDevice(MMDevice device)
+//		{
+//			var ws = new WasapiOut(true, AudioClientShareMode.Shared, 1) { Device = device };
+//			waveOut = ws;
+//			waveOut.Initialize(this);
+//			waveOut.Play();
+//		}
 
 		private void buttonExit_Click(object sender, EventArgs e)
 		{
 			Close();
-		}
-
-		protected override void OnFormClosed(FormClosedEventArgs e)
-		{
-			waveOut.Dispose();
-			base.OnFormClosed(e);
 		}
 
 		private void tbarVolume_Scroll(object sender, EventArgs e)
@@ -153,16 +167,24 @@ namespace SynthTest
 		private long shortPos = 0;
 		public long Position { get { return shortPos * 2; } set { shortPos = value / 2; } }
 
-		public WaveFormat WaveFormat { get; } = new WaveFormat(Global.Bitrate, 16, 1);
+//		public WaveFormat WaveFormat { get; } = new WaveFormat(Global.Bitrate, 16, 1);
 
-		System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+		private int GetSoundBytes(int handle, IntPtr buffer, int length, IntPtr user)
+		{
+			byte[] dataArray = new byte[length];
+			int readBytes = Read(dataArray, 0, length);
+			Marshal.Copy(dataArray, 0, buffer, readBytes);
+			return readBytes;
+		}
+		
+		Stopwatch sw = new Stopwatch();
 		public int Read(byte[] buffer, int offset, int count)
 		{
 			try
 			{
-				if (WaveFormat.BitsPerSample == 8)
+				if (sampleTypeFlag == BASSFlag.BASS_SAMPLE_8BITS)
 					return Read_8bit(buffer, offset, count);
-				else if (WaveFormat.BitsPerSample == 16)
+				else if (sampleTypeFlag == BASSFlag.BASS_DEFAULT)
 					return Read_16bit(buffer, offset, count);
 				else
 					return 0;
@@ -205,10 +227,6 @@ namespace SynthTest
 				}
 			}
 			sw.Stop();
-			if (mflocal.Length == 0)
-			{
-
-			}
 
 			shortPos += minOf;
 			return count;
@@ -252,7 +270,7 @@ namespace SynthTest
 
 		private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			SelectDevice((MMDevice)comboBox3.SelectedItem);
+//			SelectDevice((MMDevice)comboBox3.SelectedItem);
 		}
 	}
 }
