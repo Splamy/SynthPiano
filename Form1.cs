@@ -1,38 +1,34 @@
-﻿using System;
+﻿using SynthPiano.AudioBackend;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
+using System.Linq;
 using System.Windows.Forms;
-using Un4seen.Bass;
 
-namespace SynthTest
+namespace SynthPiano
 {
 	public partial class Form1 : Form
 	{
-		private const int sampleRateSec = 48000;
-		private const BASSFlag sampleTypeFlag = BASSFlag.BASS_DEFAULT;
-
-		private int bassStream;
 		private List<PianoKey> mixfreq = new List<PianoKey>();
 		private double volValue = 0.01;
-		private int streamBufferSize;
 
-		private STREAMPROC soundCreator;
-
-		//int[] basetable = new[] { 26200, 29400, 33000, 34900, 39200, 44000, 49525, 52400, 58800, 66000 };
+		private IAudioBackend audioBackend;
 
 		public Form1()
 		{
 			InitializeComponent();
 
-			InitBass();
+			audioBackend = new BassBackend();
+
+			audioBackend.Read = Read;
+			audioBackend.Init();
 
 			FormClosed += Form1_FormClosed;
 
-			// TODO
-			//			comboBox3.DataSource = mmdeviceCollection.ToList();
-			//			comboBox3.DisplayMember = "FriendlyName";
-			//			comboBox3.ValueMember = "DeviceID";
+			var devList = audioBackend.GetDevices().ToArray();
+			comboBox3.DataSource = devList;
+			comboBox3.DisplayMember = nameof(DeviceId.Name);
+			comboBox3.ValueMember = nameof(DeviceId.Id);
 
 			SetStyle(ControlStyles.UserPaint, true);
 			SetStyle(ControlStyles.AllPaintingInWmPaint, true);
@@ -61,40 +57,8 @@ namespace SynthTest
 
 		private void Form1_FormClosed(object sender, FormClosedEventArgs e)
 		{
-			Bass.BASS_StreamFree(bassStream);
-			Bass.BASS_Free();
+			audioBackend.Dispose();
 		}
-
-		private void InitBass()
-		{
-			Bass.BASS_Init(-1, sampleRateSec, BASSInit.BASS_DEVICE_DEFAULT | BASSInit.BASS_DEVICE_LATENCY, IntPtr.Zero);
-			BASS_INFO info = Bass.BASS_GetInfo();
-			Console.WriteLine($@"Minimal buffer size: {info.minbuf}, letency: {info.latency}");
-			Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, info.minbuf + 6);
-			Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_UPDATEPERIOD, 5);
-			Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_NET_BUFFER, info.minbuf / 2);
-
-			IntPtr pointer = new IntPtr();
-			soundCreator = GetSoundBytes;
-			bassStream = Bass.BASS_StreamCreate(sampleRateSec, 1, sampleTypeFlag, soundCreator, pointer);
-			Debug.Assert(bassStream != 0, "Stream creation failed.");
-
-			// play
-			Bass.BASS_ChannelPlay(bassStream, false);
-		}
-
-		public void AutoPlay()
-		{
-			//			SelectDevice((MMDevice)comboBox3.SelectedItem);
-		}
-
-		//		private void SelectDevice(MMDevice device)
-		//		{
-		//			var ws = new WasapiOut(true, AudioClientShareMode.Shared, 1) { Device = device };
-		//			waveOut = ws;
-		//			waveOut.Initialize(this);
-		//			waveOut.Play();
-		//		}
 
 		private void buttonExit_Click(object sender, EventArgs e)
 		{
@@ -141,7 +105,7 @@ namespace SynthTest
 		{
 			//PrecalcKeys(KeyRow1B, KeyRow1W, piano1);
 			//PrecalcKeys(KeyRow2B, KeyRow2W, piano2);
-			
+
 			PrecalcKeysV2();
 		}
 		private void PrecalcKeys(Keys[] rowb, Keys[] roww, Piano piano)
@@ -181,52 +145,33 @@ namespace SynthTest
 			PlayKey(keyIndex[keyint], false);
 		}
 
-		public bool CanSeek => false;
-		public long Length => -1;
-		private long shortPos = 0;
-		public long Position { get => shortPos * 2; set => shortPos = value / 2; }
-
-		//		public WaveFormat WaveFormat { get; } = new WaveFormat(Global.Bitrate, 16, 1);
-
-		private int GetSoundBytes(int handle, IntPtr buffer, int length, IntPtr user)
-		{
-			byte[] dataArray = new byte[length];
-			int readBytes = Read(dataArray, 0, length);
-			Marshal.Copy(dataArray, 0, buffer, readBytes);
-			Debug.WriteLine("Get: {0}, took {1}", length, sw.ElapsedMilliseconds);
-			return readBytes;
-		}
-
-		Stopwatch sw = new Stopwatch();
 		public int Read(byte[] buffer, int offset, int count)
 		{
-			try
+			int read;
+			var sw = Stopwatch.StartNew();
+			switch (Global.Bits)
 			{
-				switch (sampleTypeFlag)
-				{
-					case BASSFlag.BASS_SAMPLE_8BITS: return Read_8bit(buffer, offset, count);
-					case BASSFlag.BASS_DEFAULT: return Read_16bit(buffer, offset, count);
-					default: return 0;
-				}
+			case 8: read = Read_8bit(buffer, offset, count); break;
+			case 16: read = Read_16bit(buffer, offset, count); break;
+			default: throw new ArgumentOutOfRangeException();
 			}
-			catch (Exception e) { return 0; }
+			sw.Stop();
+			Debug.WriteLine("Get: {0}, took {1}", count, sw.ElapsedMilliseconds);
+			return read;
 		}
 
 		public unsafe int Read_16bit(byte[] buffer, int offset, int count)
 		{
-			sw.Restart();
-
 			int minOf = Math.Min(buffer.Length, count);
 			if (minOf % 2 != 0)
 				throw new ArgumentException();
-			minOf /= 2;
 			var mflocal = mixfreq.ToArray();
 
 			fixed (byte* bytePointer = buffer)
 			{
 				short* shortPointer = (short*)bytePointer;
 
-				for (int i = 0; i < minOf; i++)
+				for (int i = 0; i < minOf / 2; i++)
 				{
 					double value = 0;
 					for (int j = 0; j < mflocal.Length; j++)
@@ -246,22 +191,13 @@ namespace SynthTest
 					shortPointer[i] = (short)(value / Math.Sqrt(mflocal.Length + 1) * volValue * short.MaxValue);
 				}
 			}
-			sw.Stop();
-
-			shortPos += minOf;
-			return count;
+			return minOf;
 		}
 
 		public int Read_8bit(byte[] buffer, int offset, int count)
 		{
-			sw.Restart();
-
 			int minOf = Math.Min(buffer.Length, count);
-			if (minOf % 2 != 0)
-				throw new ArgumentException();
-			minOf /= 2;
 			var mflocal = mixfreq.ToArray();
-
 
 			for (int i = 0; i < minOf; i++)
 			{
@@ -272,10 +208,7 @@ namespace SynthTest
 				}
 				buffer[i] = (byte)(value / Math.Sqrt(mflocal.Length) * volValue * sbyte.MaxValue);
 			}
-			sw.Stop();
-
-			shortPos += minOf;
-			return count;
+			return minOf;
 		}
 
 		private void numericUpDown1_ValueChanged(object sender, EventArgs e) { piano1.Octave = (int)numericUpDown1.Value; PrecalcKeys(); }
@@ -286,7 +219,7 @@ namespace SynthTest
 
 		private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			//			SelectDevice((MMDevice)comboBox3.SelectedItem);
+			audioBackend.SetDevice(((DeviceId)comboBox3.SelectedItem).Id);
 		}
 	}
 }

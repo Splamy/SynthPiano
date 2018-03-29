@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace SynthTest
+namespace SynthPiano
 {
 	public partial class Piano : UserControl
 	{

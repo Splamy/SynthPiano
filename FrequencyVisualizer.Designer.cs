@@ -1,4 +1,4 @@
-﻿namespace SynthTest
+﻿namespace SynthPiano
 {
 	partial class FrequencyVisualizer
 	{

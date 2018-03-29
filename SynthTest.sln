@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SynthTest", "SynthTest.csproj", "{E2290EE1-C7A7-42E7-A8F7-6E37B61D3035}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SynthPiano", "SynthPiano.csproj", "{E2290EE1-C7A7-42E7-A8F7-6E37B61D3035}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

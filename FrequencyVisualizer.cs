@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SynthTest
+namespace SynthPiano
 {
 	public partial class FrequencyVisualizer : UserControl
 	{

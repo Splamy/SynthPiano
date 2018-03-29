@@ -1,4 +1,4 @@
-﻿namespace SynthTest
+﻿namespace SynthPiano
 {
 	partial class Form1
 	{
@@ -41,9 +41,9 @@
 			this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
 			this.comboBox1 = new System.Windows.Forms.ComboBox();
 			this.comboBox2 = new System.Windows.Forms.ComboBox();
-			this.frequencyVisualizer1 = new SynthTest.FrequencyVisualizer();
-			this.piano2 = new SynthTest.Piano();
-			this.piano1 = new SynthTest.Piano();
+			this.frequencyVisualizer1 = new SynthPiano.FrequencyVisualizer();
+			this.piano2 = new SynthPiano.Piano();
+			this.piano1 = new SynthPiano.Piano();
 			this.comboBox3 = new System.Windows.Forms.ComboBox();
 			((System.ComponentModel.ISupportInitialize)(this.tbarVolume)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -207,7 +207,7 @@
 			this.piano2.Octave = 3;
 			this.piano2.Size = new System.Drawing.Size(1097, 155);
 			this.piano2.TabIndex = 6;
-			this.piano2.WaveForm = SynthTest.WaveForm.Sawtooth;
+			this.piano2.WaveForm = SynthPiano.WaveForm.Sawtooth;
 			// 
 			// piano1
 			// 
@@ -217,7 +217,7 @@
 			this.piano1.Octave = 2;
 			this.piano1.Size = new System.Drawing.Size(1097, 166);
 			this.piano1.TabIndex = 5;
-			this.piano1.WaveForm = SynthTest.WaveForm.Sawtooth;
+			this.piano1.WaveForm = SynthPiano.WaveForm.Sawtooth;
 			// 
 			// comboBox3
 			// 
