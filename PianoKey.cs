@@ -74,14 +74,13 @@ namespace SynthTest
 		public double CalcFakeSine() => Math.Sin(FreqPos++ / (double)Global.Bitrate * Frequency);
 		public double CalcSquare()
 		{
-			// Math.Sin(key.FreqPos++ / (double)bitrate * key.Frequency) > 0 ? 1 : -1
 			double fperbit = (Global.Bitrate / Frequency);
 			return (FreqPos++ % fperbit) > fperbit / 2 ? 1 : -1;
 		}
 		public double CalcTriangle()
 		{
 			double fperbit = (Global.Bitrate / Frequency) * 2;
-			return (Math.Abs(((FreqPos++ % fperbit) / fperbit) - 0.5) * 4 - 1); // (FreqPos++ % fperbit) > fperbit / 2 ? linwave : 2 - linwave;
+			return (Math.Abs(((FreqPos++ % fperbit) / fperbit) - 0.5) * 4 - 1);
 		}
 		public double CalcSawtooth()
 		{

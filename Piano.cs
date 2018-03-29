@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace SynthTest
@@ -25,7 +22,7 @@ namespace SynthTest
 		public event Action<PianoKey> PianoKeyDown;
 		public event Action<PianoKey> PianoKeyUp;
 
-		private List<PianoKey> AllKeys = new List<PianoKey>();
+		public List<PianoKey> AllKeys = new List<PianoKey>();
 		public List<PianoKey> WhiteKeys { get; } = new List<PianoKey>();
 		public List<PianoKey> BlackKeys { get; } = new List<PianoKey>();
 
@@ -41,7 +38,9 @@ namespace SynthTest
 		private void Piano_Paint(object sender, PaintEventArgs e)
 		{
 			Graphics g = e.Graphics;
-			foreach (PianoKey k in AllKeys)
+			foreach (PianoKey k in WhiteKeys)
+				k.Draw(g);
+			foreach (PianoKey k in BlackKeys)
 				k.Draw(g);
 		}
 
@@ -84,6 +83,7 @@ namespace SynthTest
 			AllKeys.AddRange(WhiteKeys.ToArray());
 			AllKeys.AddRange(BlackKeys.ToArray());
 			AllKeys.ForEach(x => x.Parent = this);
+			AllKeys.Sort((a, b) => Math.Sign(a.Frequency - b.Frequency));
 		}
 
 		private void Piano_Resize(object sender, EventArgs e)
@@ -108,7 +108,7 @@ namespace SynthTest
 
 		private void Piano_MouseMove(object sender, MouseEventArgs e)
 		{
-			if(isDown)
+			if (isDown)
 			{
 				var key = FindFrequency(e.Location);
 				InvokeDown(key);

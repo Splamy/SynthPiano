@@ -130,10 +130,19 @@ namespace SynthTest
 		static readonly Keys[] KeyRow2B = { Keys.A, Keys.S, Keys.F, Keys.G, Keys.H, Keys.K, Keys.L, Keys.Oem7 };
 		static readonly Keys[] KeyRow2W = { Keys.Oem102, Keys.Z, Keys.X, Keys.C, Keys.V, Keys.B, Keys.N, Keys.M, Keys.Oemcomma, Keys.OemPeriod, Keys.Oem2 };
 
+		private static readonly Keys[][] KeyMatrixV2 = {
+			new[] { Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, Keys.D0, Keys.OemMinus /*?*/, Keys.Oemplus },
+			new[] { Keys.Q, Keys.W, Keys.E, Keys.R, Keys.T, Keys.Y, Keys.U, Keys.I, Keys.O, Keys.P, Keys.Oem4, Keys.Oem6 },
+			new[] { Keys.A, Keys.S, Keys.D, Keys.F, Keys.G, Keys.H, Keys.J, Keys.K, Keys.L, Keys.Oem1, Keys.Oem7, Keys.Oem5 },
+			new[] { Keys.Z, Keys.X, Keys.C, Keys.V, Keys.B, Keys.N, Keys.M, Keys.Oemcomma, Keys.OemPeriod, Keys.Oem2 },
+		};
+
 		private void PrecalcKeys()
 		{
-			PrecalcKeys(KeyRow1B, KeyRow1W, piano1);
-			PrecalcKeys(KeyRow2B, KeyRow2W, piano2);
+			//PrecalcKeys(KeyRow1B, KeyRow1W, piano1);
+			//PrecalcKeys(KeyRow2B, KeyRow2W, piano2);
+			
+			PrecalcKeysV2();
 		}
 		private void PrecalcKeys(Keys[] rowb, Keys[] roww, Piano piano)
 		{
@@ -143,8 +152,17 @@ namespace SynthTest
 				keyIndex[(int)roww[i]] = piano.WhiteKeys[i];
 		}
 
+		private void PrecalcKeysV2()
+		{
+			for (int i = 0; i < 4 * 12; i++)
+			{
+				try { keyIndex[(int)KeyMatrixV2[i % 4][i / 4]] = piano1.AllKeys[i]; } catch { } // TODO not-lazy :P
+			}
+		}
+
 		PianoKey[] keyIndex = new PianoKey[255];
 		bool[] down = new bool[255];
+
 		protected override void OnKeyDown(KeyEventArgs e)
 		{
 			base.OnKeyDown(e);
