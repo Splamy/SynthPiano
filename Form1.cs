@@ -19,9 +19,7 @@ namespace SynthPiano
 			InitializeComponent();
 
 			audioBackend = new BassBackend();
-
 			audioBackend.Read = Read;
-			audioBackend.Init();
 
 			FormClosed += Form1_FormClosed;
 
@@ -39,7 +37,7 @@ namespace SynthPiano
 			comboBox1.SelectedIndex = (int)WaveForm.Sawtooth;
 			comboBox2.SelectedIndex = (int)WaveForm.Sawtooth;
 
-			tbarVolume_Scroll(tbarVolume, null);
+			TbarVolume_Scroll(tbarVolume, null);
 			numericUpDown1.Value = piano1.Octave;
 			numericUpDown2.Value = piano2.Octave;
 
@@ -55,17 +53,22 @@ namespace SynthPiano
 			PrecalcKeys();
 		}
 
+		public void AutoPlay()
+		{
+			audioBackend.Init();
+		}
+
 		private void Form1_FormClosed(object sender, FormClosedEventArgs e)
 		{
 			audioBackend.Dispose();
 		}
 
-		private void buttonExit_Click(object sender, EventArgs e)
+		private void ButtonExit_Click(object sender, EventArgs e)
 		{
 			Close();
 		}
 
-		private void tbarVolume_Scroll(object sender, EventArgs e)
+		private void TbarVolume_Scroll(object sender, EventArgs e)
 		{
 			textVolume.Text = ((TrackBar)sender).Value.ToString();
 			volValue = ((TrackBar)sender).Value / 100d;
@@ -88,11 +91,11 @@ namespace SynthPiano
 			key.Parent.Invalidate(key.Bounds);
 		}
 
-		static readonly Keys[] KeyRow1B = { Keys.D2, Keys.D3, Keys.D5, Keys.D6, Keys.D7, Keys.D9, Keys.D0, Keys.Oemplus };
-		static readonly Keys[] KeyRow1W = { Keys.Q, Keys.W, Keys.E, Keys.R, Keys.T, Keys.Y, Keys.U, Keys.I, Keys.O, Keys.P, Keys.Oem4, Keys.Oem6 };
+		private static readonly Keys[] KeyRow1B = { Keys.D2, Keys.D3, Keys.D5, Keys.D6, Keys.D7, Keys.D9, Keys.D0, Keys.Oemplus };
+		private static readonly Keys[] KeyRow1W = { Keys.Q, Keys.W, Keys.E, Keys.R, Keys.T, Keys.Y, Keys.U, Keys.I, Keys.O, Keys.P, Keys.Oem4, Keys.Oem6 };
 
-		static readonly Keys[] KeyRow2B = { Keys.A, Keys.S, Keys.F, Keys.G, Keys.H, Keys.K, Keys.L, Keys.Oem7 };
-		static readonly Keys[] KeyRow2W = { Keys.Oem102, Keys.Z, Keys.X, Keys.C, Keys.V, Keys.B, Keys.N, Keys.M, Keys.Oemcomma, Keys.OemPeriod, Keys.Oem2 };
+		private static readonly Keys[] KeyRow2B = { Keys.A, Keys.S, Keys.F, Keys.G, Keys.H, Keys.K, Keys.L, Keys.Oem7 };
+		private static readonly Keys[] KeyRow2W = { Keys.Oem102, Keys.Z, Keys.X, Keys.C, Keys.V, Keys.B, Keys.N, Keys.M, Keys.Oemcomma, Keys.OemPeriod, Keys.Oem2 };
 
 		private static readonly Keys[][] KeyMatrixV2 = {
 			new[] { Keys.D1, Keys.D2, Keys.D3, Keys.D4, Keys.D5, Keys.D6, Keys.D7, Keys.D8, Keys.D9, Keys.D0, Keys.OemMinus /*?*/, Keys.Oemplus },
@@ -108,6 +111,7 @@ namespace SynthPiano
 
 			PrecalcKeysV2();
 		}
+
 		private void PrecalcKeys(Keys[] rowb, Keys[] roww, Piano piano)
 		{
 			for (int i = 0; i < rowb.Length; i++)
@@ -124,8 +128,8 @@ namespace SynthPiano
 			}
 		}
 
-		PianoKey[] keyIndex = new PianoKey[255];
-		bool[] down = new bool[255];
+		private PianoKey[] keyIndex = new PianoKey[255];
+		private bool[] down = new bool[255];
 
 		protected override void OnKeyDown(KeyEventArgs e)
 		{
@@ -145,61 +149,26 @@ namespace SynthPiano
 			PlayKey(keyIndex[keyint], false);
 		}
 
-		public int Read(byte[] buffer, int offset, int count)
+		public void Read(Span<byte> buffer)
 		{
-			int read;
 			var sw = Stopwatch.StartNew();
 			switch (Global.Bits)
 			{
-			case 8: read = Read_8bit(buffer, offset, count); break;
-			case 16: read = Read_16bit(buffer, offset, count); break;
+#pragma warning disable CS0162 // Unreachable code detected
+			case 8: Read_8bit(buffer); break;
+			case 16: Read_16bit(buffer); break;
 			default: throw new ArgumentOutOfRangeException();
+#pragma warning restore CS0162 // Unreachable code detected
 			}
 			sw.Stop();
-			Debug.WriteLine("Get: {0}, took {1}", count, sw.ElapsedMilliseconds);
-			return read;
+			Debug.WriteLine("Get: {0}, took {1}", buffer.Length, sw.ElapsedMilliseconds);
 		}
 
-		public unsafe int Read_16bit(byte[] buffer, int offset, int count)
+		public void Read_8bit(Span<byte> buffer)
 		{
-			int minOf = Math.Min(buffer.Length, count);
-			if (minOf % 2 != 0)
-				throw new ArgumentException();
 			var mflocal = mixfreq.ToArray();
 
-			fixed (byte* bytePointer = buffer)
-			{
-				short* shortPointer = (short*)bytePointer;
-
-				for (int i = 0; i < minOf / 2; i++)
-				{
-					double value = 0;
-					for (int j = 0; j < mflocal.Length; j++)
-					{
-						var key = mflocal[j];
-						if (key == null) continue;
-						var addval = key.CalcWave();
-						value += addval;
-						if (key.WaveFin && key.IsFin(addval))
-						{
-							mixfreq.Remove(key);
-							key.WaveFin = false;
-							key.FreqPos = 0;
-							mflocal[j] = null;
-						}
-					}
-					shortPointer[i] = (short)(value / Math.Sqrt(mflocal.Length + 1) * volValue * short.MaxValue);
-				}
-			}
-			return minOf;
-		}
-
-		public int Read_8bit(byte[] buffer, int offset, int count)
-		{
-			int minOf = Math.Min(buffer.Length, count);
-			var mflocal = mixfreq.ToArray();
-
-			for (int i = 0; i < minOf; i++)
+			for (int i = 0; i < buffer.Length; i++)
 			{
 				double value = 0;
 				foreach (var key in mflocal)
@@ -208,16 +177,44 @@ namespace SynthPiano
 				}
 				buffer[i] = (byte)(value / Math.Sqrt(mflocal.Length) * volValue * sbyte.MaxValue);
 			}
-			return minOf;
 		}
 
-		private void numericUpDown1_ValueChanged(object sender, EventArgs e) { piano1.Octave = (int)numericUpDown1.Value; PrecalcKeys(); }
-		private void numericUpDown2_ValueChanged(object sender, EventArgs e) { piano2.Octave = (int)numericUpDown2.Value; PrecalcKeys(); }
+		public void Read_16bit(Span<byte> buffer)
+		{
+			if (buffer.Length % 2 != 0)
+				throw new ArgumentException();
+			var mflocal = mixfreq.ToArray();
 
-		private void comboBox1_SelectedIndexChanged(object sender, EventArgs e) { piano1.WaveForm = (WaveForm)comboBox1.SelectedItem; }
-		private void comboBox2_SelectedIndexChanged(object sender, EventArgs e) { piano2.WaveForm = (WaveForm)comboBox2.SelectedItem; }
+			var shortPointer = buffer.NonPortableCast<byte, short>();
 
-		private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
+			for (int i = 0; i < shortPointer.Length; i++)
+			{
+				double value = 0;
+				for (int j = 0; j < mflocal.Length; j++)
+				{
+					var key = mflocal[j];
+					if (key == null) continue;
+					var addval = key.CalcWave();
+					value += addval;
+					if (key.WaveFin && key.IsFin(addval))
+					{
+						mixfreq.Remove(key);
+						key.WaveFin = false;
+						key.FreqPos = 0;
+						mflocal[j] = null;
+					}
+				}
+				shortPointer[i] = (short)(value / Math.Sqrt(mflocal.Length + 1) * volValue * short.MaxValue);
+			}
+		}
+
+		private void NumericUpDown1_ValueChanged(object sender, EventArgs e) { piano1.Octave = (int)numericUpDown1.Value; PrecalcKeys(); }
+		private void NumericUpDown2_ValueChanged(object sender, EventArgs e) { piano2.Octave = (int)numericUpDown2.Value; PrecalcKeys(); }
+
+		private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e) { piano1.WaveForm = (WaveForm)comboBox1.SelectedItem; }
+		private void ComboBox2_SelectedIndexChanged(object sender, EventArgs e) { piano2.WaveForm = (WaveForm)comboBox2.SelectedItem; }
+
+		private void ComboBox3_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			audioBackend.SetDevice(((DeviceId)comboBox3.SelectedItem).Id);
 		}

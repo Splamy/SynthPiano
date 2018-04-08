@@ -17,22 +17,24 @@ namespace SynthPiano
 		public bool Black { get; }
 
 		public double Frequency { get; }
+		private readonly double fperbit;
 		public int FreqPos { get; set; }
 
 		private bool waveFin;
 		public bool WaveFin { get { return waveFin; } set { waveFin = value; if (waveFin) lastAbs = double.PositiveInfinity; } }
 		private double lastAbs;
 
-		const int blackkHeight = 130;
+		public const int blackkHeight = 130;
 		public const int blackkWidth = 20;
 
-		const int whitekHeight = 150;
+		public const int whitekHeight = 150;
 		public const int whitekWidth = 50;
 
 		public PianoKey(int x, int y, double frequency, bool black)
 		{
 			Black = black;
 			Frequency = frequency;
+			fperbit = Global.Bitrate / Frequency;
 			Bounds = black
 				  ? new Rectangle(x, y, blackkWidth, blackkHeight)
 				  : new Rectangle(x, y, whitekWidth, whitekHeight);
@@ -43,7 +45,9 @@ namespace SynthPiano
 		public void Draw(Graphics g)
 		{
 			if (Black)
+			{
 				g.FillRectangle(Selected ? Brushes.DarkBlue : Brushes.Black, Bounds);
+			}
 			else
 			{
 				g.FillRectangle(Selected ? Brushes.SkyBlue : Brushes.White, Bounds);
@@ -72,21 +76,9 @@ namespace SynthPiano
 
 		public double CalcSine() => Math.Sin(FreqPos++ / (double)Global.Bitrate * Frequency * 2 * Math.PI);
 		public double CalcFakeSine() => Math.Sin(FreqPos++ / (double)Global.Bitrate * Frequency);
-		public double CalcSquare()
-		{
-			double fperbit = (Global.Bitrate / Frequency);
-			return (FreqPos++ % fperbit) > fperbit / 2 ? 1 : -1;
-		}
-		public double CalcTriangle()
-		{
-			double fperbit = (Global.Bitrate / Frequency) * 2;
-			return (Math.Abs(((FreqPos++ % fperbit) / fperbit) - 0.5) * 4 - 1);
-		}
-		public double CalcSawtooth()
-		{
-			double fperbit = (Global.Bitrate / Frequency);
-			return 1 - ((FreqPos++ % fperbit) / fperbit) * 2;
-		}
+		public double CalcSquare() => (FreqPos++ % fperbit) > fperbit / 2 ? 1 : -1;
+		public double CalcTriangle() => (Math.Abs(((FreqPos++ % fperbit) / fperbit) - 0.5) * 4) - 1;
+		public double CalcSawtooth() => 1 - (((FreqPos++ % fperbit) / fperbit) * 2);
 
 		public double CalcWave()
 		{

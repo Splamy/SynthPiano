@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace SynthPiano
 {
-	class Global
+	public static class Global
 	{
-		public static int Bitrate = 48000;
-		public static int Bits = 16;
-		public static int Channel = 1;
+		public const int Bitrate = 48000;
+		public const int Bits = 16;
+		public const int Channel = 1;
 	}
 }

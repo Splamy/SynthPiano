@@ -9,7 +9,7 @@ namespace SynthPiano.AudioBackend
 {
 	class CsCoreBackend : IAudioBackend, IWaveSource
 	{
-		public Func<byte[], int, int, int> Read { get; set; }
+		public AudioGenerate Read { get; set; }
 
 		private List<MMDevice> devices = new List<MMDevice>();
 		private ISoundOut waveOut;
@@ -45,9 +45,9 @@ namespace SynthPiano.AudioBackend
 
 		int IReadableAudioSource<byte>.Read(byte[] buffer, int offset, int count)
 		{
-			var read = Read(buffer, offset, count);
-			shortPos += read;
-			return read;
+			Read(buffer.AsSpan().Slice(offset, count));
+			shortPos += count;
+			return count;
 		}
 
 		public IEnumerable<DeviceId> GetDevices()

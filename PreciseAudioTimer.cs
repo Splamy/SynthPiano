@@ -35,7 +35,7 @@ namespace TS3AudioBot.Audio
 			if (bits != 8 && bits != 16 && bits != 24 && bits != 32) throw new ArgumentException(nameof(bits));
 			if (channel != 1 && channel != 2) throw new ArgumentException(nameof(channel));
 			stopwatch = new Stopwatch();
-			
+
 			SampleRate = sampleRate;
 			BitsPerSample = bits;
 			Channel = channel;

@@ -67,7 +67,7 @@
 			this.buttonExit.Size = new System.Drawing.Size(124, 25);
 			this.buttonExit.TabIndex = 0;
 			this.buttonExit.Text = "Exit";
-			this.buttonExit.Click += new System.EventHandler(this.buttonExit_Click);
+			this.buttonExit.Click += new System.EventHandler(this.ButtonExit_Click);
 			// 
 			// label11
 			// 
@@ -87,7 +87,7 @@
 			this.tbarVolume.TabIndex = 4;
 			this.tbarVolume.TickFrequency = 5;
 			this.tbarVolume.Value = 20;
-			this.tbarVolume.Scroll += new System.EventHandler(this.tbarVolume_Scroll);
+			this.tbarVolume.Scroll += new System.EventHandler(this.TbarVolume_Scroll);
 			// 
 			// label8
 			// 
@@ -123,7 +123,7 @@
             0,
             0,
             0});
-			this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+			this.numericUpDown1.ValueChanged += new System.EventHandler(this.NumericUpDown1_ValueChanged);
 			// 
 			// label10
 			// 
@@ -168,7 +168,7 @@
             0,
             0,
             0});
-			this.numericUpDown2.ValueChanged += new System.EventHandler(this.numericUpDown2_ValueChanged);
+			this.numericUpDown2.ValueChanged += new System.EventHandler(this.NumericUpDown2_ValueChanged);
 			// 
 			// comboBox1
 			// 
@@ -178,7 +178,7 @@
 			this.comboBox1.Name = "comboBox1";
 			this.comboBox1.Size = new System.Drawing.Size(121, 21);
 			this.comboBox1.TabIndex = 12;
-			this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+			this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.ComboBox1_SelectedIndexChanged);
 			// 
 			// comboBox2
 			// 
@@ -188,7 +188,7 @@
 			this.comboBox2.Name = "comboBox2";
 			this.comboBox2.Size = new System.Drawing.Size(121, 21);
 			this.comboBox2.TabIndex = 13;
-			this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
+			this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.ComboBox2_SelectedIndexChanged);
 			// 
 			// frequencyVisualizer1
 			// 
@@ -227,7 +227,7 @@
 			this.comboBox3.Name = "comboBox3";
 			this.comboBox3.Size = new System.Drawing.Size(236, 21);
 			this.comboBox3.TabIndex = 15;
-			this.comboBox3.SelectedIndexChanged += new System.EventHandler(this.comboBox3_SelectedIndexChanged);
+			this.comboBox3.SelectedIndexChanged += new System.EventHandler(this.ComboBox3_SelectedIndexChanged);
 			// 
 			// Form1
 			// 

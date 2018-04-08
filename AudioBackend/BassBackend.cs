@@ -13,8 +13,9 @@ namespace SynthPiano.AudioBackend
 		private const BASSFlag sampleTypeFlag = BASSFlag.BASS_DEFAULT;
 		private int bassStream;
 		private STREAMPROC soundCreator;
+		private byte[] dataArray = new byte[1024];
 
-		public Func<byte[], int, int, int> Read { get; set; }
+		public AudioGenerate Read { get; set; }
 
 		public void Init()
 		{
@@ -37,10 +38,12 @@ namespace SynthPiano.AudioBackend
 
 		private int GetSoundBytes(int handle, IntPtr buffer, int length, IntPtr user)
 		{
-			byte[] dataArray = new byte[length];
-			int readBytes = Read(dataArray, 0, length);
-			Marshal.Copy(dataArray, 0, buffer, readBytes);
-			return readBytes;
+			if(dataArray.Length < length)
+				   dataArray = new byte[length];
+
+			Read(dataArray.AsSpan().Slice(0, length));
+			Marshal.Copy(dataArray, 0, buffer, length);
+			return length;
 		}
 
 		public void Dispose()
