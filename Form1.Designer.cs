@@ -41,13 +41,18 @@
 			this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
 			this.comboBox1 = new System.Windows.Forms.ComboBox();
 			this.comboBox2 = new System.Windows.Forms.ComboBox();
+			this.comboBox3 = new System.Windows.Forms.ComboBox();
+			this.label3 = new System.Windows.Forms.Label();
+			this.label4 = new System.Windows.Forms.Label();
+			this.label5 = new System.Windows.Forms.Label();
+			this.tbarFade = new System.Windows.Forms.TrackBar();
 			this.frequencyVisualizer1 = new SynthTest.FrequencyVisualizer();
 			this.piano2 = new SynthTest.Piano();
 			this.piano1 = new SynthTest.Piano();
-			this.comboBox3 = new System.Windows.Forms.ComboBox();
 			((System.ComponentModel.ISupportInitialize)(this.tbarVolume)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.tbarFade)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// textVolume
@@ -62,7 +67,7 @@
 			// buttonExit
 			// 
 			this.buttonExit.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.buttonExit.Location = new System.Drawing.Point(15, 392);
+			this.buttonExit.Location = new System.Drawing.Point(12, 440);
 			this.buttonExit.Name = "buttonExit";
 			this.buttonExit.Size = new System.Drawing.Size(124, 25);
 			this.buttonExit.TabIndex = 0;
@@ -80,13 +85,14 @@
 			// 
 			// tbarVolume
 			// 
-			this.tbarVolume.Location = new System.Drawing.Point(176, 335);
+			this.tbarVolume.Location = new System.Drawing.Point(176, 344);
 			this.tbarVolume.Maximum = 100;
 			this.tbarVolume.Name = "tbarVolume";
 			this.tbarVolume.Size = new System.Drawing.Size(236, 45);
 			this.tbarVolume.TabIndex = 4;
 			this.tbarVolume.TickFrequency = 5;
-			this.tbarVolume.Value = 20;
+			this.tbarVolume.TickStyle = System.Windows.Forms.TickStyle.None;
+			this.tbarVolume.Value = 15;
 			this.tbarVolume.Scroll += new System.EventHandler(this.tbarVolume_Scroll);
 			// 
 			// label8
@@ -190,6 +196,55 @@
 			this.comboBox2.TabIndex = 13;
 			this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
 			// 
+			// comboBox3
+			// 
+			this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboBox3.FormattingEnabled = true;
+			this.comboBox3.Location = new System.Drawing.Point(173, 443);
+			this.comboBox3.Name = "comboBox3";
+			this.comboBox3.Size = new System.Drawing.Size(236, 21);
+			this.comboBox3.TabIndex = 15;
+			this.comboBox3.SelectedIndexChanged += new System.EventHandler(this.comboBox3_SelectedIndexChanged);
+			// 
+			// label3
+			// 
+			this.label3.Location = new System.Drawing.Point(12, 383);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(73, 20);
+			this.label3.TabIndex = 20;
+			this.label3.Text = "Fade";
+			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			// 
+			// label4
+			// 
+			this.label4.Location = new System.Drawing.Point(140, 383);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(41, 20);
+			this.label4.TabIndex = 17;
+			this.label4.Text = "Fast";
+			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			// 
+			// label5
+			// 
+			this.label5.Location = new System.Drawing.Point(407, 384);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(47, 20);
+			this.label5.TabIndex = 18;
+			this.label5.Text = "Slow";
+			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			// 
+			// tbarFade
+			// 
+			this.tbarFade.Location = new System.Drawing.Point(176, 384);
+			this.tbarFade.Maximum = 100;
+			this.tbarFade.Name = "tbarFade";
+			this.tbarFade.Size = new System.Drawing.Size(236, 45);
+			this.tbarFade.TabIndex = 19;
+			this.tbarFade.TickFrequency = 10;
+			this.tbarFade.TickStyle = System.Windows.Forms.TickStyle.None;
+			this.tbarFade.Value = 1;
+			this.tbarFade.Scroll += new System.EventHandler(this.TbarFade_Scroll);
+			// 
 			// frequencyVisualizer1
 			// 
 			this.frequencyVisualizer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -205,7 +260,7 @@
 			this.piano2.Location = new System.Drawing.Point(0, 166);
 			this.piano2.Name = "piano2";
 			this.piano2.Octave = 3;
-			this.piano2.Size = new System.Drawing.Size(1097, 155);
+			this.piano2.Size = new System.Drawing.Size(1400, 155);
 			this.piano2.TabIndex = 6;
 			this.piano2.WaveForm = SynthTest.WaveForm.Sawtooth;
 			// 
@@ -215,25 +270,19 @@
 			this.piano1.Location = new System.Drawing.Point(0, 0);
 			this.piano1.Name = "piano1";
 			this.piano1.Octave = 2;
-			this.piano1.Size = new System.Drawing.Size(1097, 166);
+			this.piano1.Size = new System.Drawing.Size(1400, 166);
 			this.piano1.TabIndex = 5;
 			this.piano1.WaveForm = SynthTest.WaveForm.Sawtooth;
-			// 
-			// comboBox3
-			// 
-			this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboBox3.FormattingEnabled = true;
-			this.comboBox3.Location = new System.Drawing.Point(176, 395);
-			this.comboBox3.Name = "comboBox3";
-			this.comboBox3.Size = new System.Drawing.Size(236, 21);
-			this.comboBox3.TabIndex = 15;
-			this.comboBox3.SelectedIndexChanged += new System.EventHandler(this.comboBox3_SelectedIndexChanged);
 			// 
 			// Form1
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.buttonExit;
-			this.ClientSize = new System.Drawing.Size(1097, 442);
+			this.ClientSize = new System.Drawing.Size(1400, 500);
+			this.Controls.Add(this.label3);
+			this.Controls.Add(this.label4);
+			this.Controls.Add(this.label5);
+			this.Controls.Add(this.tbarFade);
 			this.Controls.Add(this.comboBox3);
 			this.Controls.Add(this.frequencyVisualizer1);
 			this.Controls.Add(this.comboBox2);
@@ -257,6 +306,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.tbarVolume)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.tbarFade)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -281,6 +331,10 @@
 		private System.Windows.Forms.ComboBox comboBox2;
 		private FrequencyVisualizer frequencyVisualizer1;
 		private System.Windows.Forms.ComboBox comboBox3;
+		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.Label label4;
+		private System.Windows.Forms.Label label5;
+		private System.Windows.Forms.TrackBar tbarFade;
 	}
 }
 

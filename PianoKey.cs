@@ -18,9 +18,10 @@ namespace SynthTest
 
 		public double Frequency { get; }
 		public int FreqPos { get; set; }
+		public int FadePos { get; set; }
 
-		private bool waveFin;
-		public bool WaveFin { get { return waveFin; } set { waveFin = value; if (waveFin) lastAbs = double.PositiveInfinity; } }
+		public bool IsWaveFading { get; private set; }
+		public bool IsWaveFinalizing { get; private set; }
 		private double lastAbs;
 
 		const int blackkHeight = 130;
@@ -56,7 +57,29 @@ namespace SynthTest
 			return Bounds.Contains(p);
 		}
 
-		public bool IsFin(double val)
+		public void Reset()
+		{
+			IsWaveFading = false;
+			IsWaveFinalizing = false;
+			FreqPos = 0;
+			FadePos = 0;
+		}
+
+		public void Fade()
+		{
+			FadePos = FreqPos;
+			IsWaveFading = true;
+		}
+
+		public void FinalizeWave()
+		{
+			lastAbs = double.PositiveInfinity;
+			IsWaveFinalizing = true;
+		}
+
+		public double GetFadeMul() => Math.Pow(Global.FadePower, (FreqPos - FadePos) / (double)Global.Bitrate * 10);
+
+		public bool IsFinal(double val)
 		{
 			var absval = Math.Abs(val);
 			if (absval < lastAbs)
@@ -71,7 +94,6 @@ namespace SynthTest
 		}
 
 		public double CalcSine() => Math.Sin(FreqPos++ / (double)Global.Bitrate * Frequency * 2 * Math.PI);
-		public double CalcFakeSine() => Math.Sin(FreqPos++ / (double)Global.Bitrate * Frequency);
 		public double CalcSquare()
 		{
 			double fperbit = (Global.Bitrate / Frequency);
@@ -93,7 +115,6 @@ namespace SynthTest
 			switch (Parent.WaveForm)
 			{
 			case WaveForm.Sine: return CalcSine();
-			case WaveForm.FakeSine: return CalcFakeSine();
 			case WaveForm.Sqaure: return CalcSquare();
 			case WaveForm.Triangle: return CalcTriangle();
 			case WaveForm.Sawtooth: return CalcSawtooth();

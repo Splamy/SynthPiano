@@ -9,6 +9,7 @@ using System.Linq;
 using CSCore;
 using CSCore.SoundOut;
 using CSCore.CoreAudioAPI;
+using System.ComponentModel.Design;
 
 namespace SynthTest
 {
@@ -92,19 +93,35 @@ namespace SynthTest
 			volValue = ((TrackBar)sender).Value / 100d;
 		}
 
+		private void TbarFade_Scroll(object sender, EventArgs e)
+		{
+			const double fshort = 0.05;
+			const double flong = 0.9;
+
+			var rawValue = ((TrackBar)sender).Value;
+			var rawMax = ((TrackBar)sender).Maximum;
+			Global.FadePower = (rawValue / (double)rawMax) * (flong - fshort) + fshort;
+		}
+
 		private void PlayKey(PianoKey key, bool on)
 		{
 			key.Selected = on;
 			bool cont = mixfreq.Contains(key);
-			if (on && !cont)
+			if (on)
 			{
-				key.WaveFin = false;
-				mixfreq.Add(key);
+				key.Reset();
+				if (!cont)
+				{
+					mixfreq.Add(key);
+				}
 			}
 			else if (!on && cont)
 			{
-				key.WaveFin = true;
-				//key.FreqPos = 0;
+				if (tbarFade.Value == 0)
+					key.FinalizeWave();
+				else
+					key.Fade();
+				// or finalize
 			}
 			key.Parent.Invalidate(key.Bounds);
 		}
@@ -126,7 +143,7 @@ namespace SynthTest
 		{
 			//PrecalcKeys(KeyRow1B, KeyRow1W, piano1);
 			//PrecalcKeys(KeyRow2B, KeyRow2W, piano2);
-			
+
 			PrecalcKeysV2();
 		}
 		private void PrecalcKeys(Keys[] rowb, Keys[] roww, Piano piano)
@@ -145,8 +162,8 @@ namespace SynthTest
 			}
 		}
 
-		PianoKey[] keyIndex = new PianoKey[255];
-		bool[] down = new bool[255];
+		readonly PianoKey[] keyIndex = new PianoKey[255];
+		readonly bool[] down = new bool[255];
 
 		protected override void OnKeyDown(KeyEventArgs e)
 		{
@@ -173,93 +190,78 @@ namespace SynthTest
 
 		public WaveFormat WaveFormat { get; } = new WaveFormat(Global.Bitrate, 16, 1);
 
-		System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 		public int Read(byte[] buffer, int offset, int count)
 		{
 			try
 			{
 				if (WaveFormat.BitsPerSample == 8)
-					return Read_8bit(buffer, offset, count);
+					return Read_Nbit<sbyte>(buffer, offset, count);
 				else if (WaveFormat.BitsPerSample == 16)
-					return Read_16bit(buffer, offset, count);
+					return Read_Nbit<short>(buffer, offset, count);
 				else
 					return 0;
 			}
 			catch (Exception e) { return 0; }
 		}
 
-		public unsafe int Read_16bit(byte[] buffer, int offset, int count)
+		public unsafe int Read_Nbit<T>(byte[] buffer, int offset, int count) where T : unmanaged
 		{
-			sw.Restart();
-
 			int minOf = Math.Min(buffer.Length, count);
-			if (minOf % 2 != 0)
+			if (minOf % sizeof(T) != 0)
 				throw new ArgumentException();
-			minOf /= 2;
+			minOf /= sizeof(T);
 			var mflocal = mixfreq.ToArray();
 
 			fixed (byte* bytePointer = buffer)
 			{
-				short* shortPointer = (short*)bytePointer;
+				var samplePointer = (T*)bytePointer;
 
 				for (int i = 0; i < minOf; i++)
 				{
 					double value = 0;
+
 					for (int j = 0; j < mflocal.Length; j++)
 					{
 						var key = mflocal[j];
 						if (key == null) continue;
 						var addval = key.CalcWave();
-						value += addval;
-						if (key.WaveFin && key.IsFin(addval))
+
+						if (key.IsWaveFinalizing && key.IsFinal(addval))
 						{
 							mixfreq.Remove(key);
-							key.WaveFin = false;
-							key.FreqPos = 0;
 							mflocal[j] = null;
 						}
-					}
-					shortPointer[i] = (short)(value / Math.Sqrt(mflocal.Length + 1) * volValue * short.MaxValue);
-				}
-			}
-			sw.Stop();
-			if (mflocal.Length == 0)
-			{
 
+						if (key.IsWaveFading)
+						{
+							var fadeMul = key.GetFadeMul();
+							if (!key.IsWaveFinalizing && fadeMul <= 0.001)
+							{
+								key.FinalizeWave();
+							}
+							value += addval * fadeMul;
+						}
+						else
+						{
+							value += addval;
+						}
+					}
+
+					int maxVal = (1 << (8 * sizeof(T) - 1)) - 1;
+					samplePointer[i] = ConvNum<T>(value * volValue * maxVal); // / Math.Sqrt(mixfreq.Count) 
+				}
 			}
 
 			shortPos += minOf;
 			return count;
 		}
 
-		public unsafe int Read_8bit(byte[] buffer, int offset, int count)
+		public static T ConvNum<T>(double val)
 		{
-			sw.Restart();
-
-			int minOf = Math.Min(buffer.Length, count);
-			if (minOf % 2 != 0)
-				throw new ArgumentException();
-			minOf /= 2;
-			var mflocal = mixfreq.ToArray();
-
-			fixed (byte* bytePointer = buffer)
-			{
-				sbyte* sbytePointer = (sbyte*)bytePointer;
-
-				for (int i = 0; i < minOf; i++)
-				{
-					double value = 0;
-					foreach (var key in mflocal)
-					{
-						value += key.CalcWave();
-					}
-					sbytePointer[i] = (sbyte)(value / Math.Sqrt(mflocal.Length) * volValue * sbyte.MaxValue);
-				}
-			}
-			sw.Stop();
-
-			shortPos += minOf;
-			return count;
+			if (typeof(T) == typeof(sbyte)) return (T)(object)(sbyte)val;
+			else if (typeof(T) == typeof(short)) return (T)(object)(short)val;
+			else if (typeof(T) == typeof(int)) return (T)(object)(int)val;
+			else throw new NotSupportedException();
 		}
 
 		private void numericUpDown1_ValueChanged(object sender, EventArgs e) { piano1.Octave = (int)numericUpDown1.Value; PrecalcKeys(); }

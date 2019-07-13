@@ -139,7 +139,6 @@ namespace SynthTest
 	public enum WaveForm
 	{
 		Sine,
-		FakeSine,
 		Sqaure,
 		Triangle,
 		Sawtooth,

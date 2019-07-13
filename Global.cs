@@ -9,5 +9,7 @@ namespace SynthTest
 	class Global
 	{
 		public static int Bitrate = 48000;
+
+		public static double FadePower = 0.01;
 	}
 }
