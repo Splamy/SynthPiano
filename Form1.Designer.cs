@@ -29,7 +29,6 @@
 		private void InitializeComponent()
 		{
 			this.textVolume = new System.Windows.Forms.TextBox();
-			this.buttonExit = new System.Windows.Forms.Button();
 			this.label11 = new System.Windows.Forms.Label();
 			this.tbarVolume = new System.Windows.Forms.TrackBar();
 			this.label8 = new System.Windows.Forms.Label();
@@ -64,16 +63,6 @@
 			this.textVolume.TabIndex = 1;
 			this.textVolume.Text = "0";
 			// 
-			// buttonExit
-			// 
-			this.buttonExit.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.buttonExit.Location = new System.Drawing.Point(12, 440);
-			this.buttonExit.Name = "buttonExit";
-			this.buttonExit.Size = new System.Drawing.Size(124, 25);
-			this.buttonExit.TabIndex = 0;
-			this.buttonExit.Text = "Exit";
-			this.buttonExit.Click += new System.EventHandler(this.buttonExit_Click);
-			// 
 			// label11
 			// 
 			this.label11.Location = new System.Drawing.Point(6, 13);
@@ -92,7 +81,7 @@
 			this.tbarVolume.TabIndex = 4;
 			this.tbarVolume.TickFrequency = 5;
 			this.tbarVolume.TickStyle = System.Windows.Forms.TickStyle.None;
-			this.tbarVolume.Value = 15;
+			this.tbarVolume.Value = 10;
 			this.tbarVolume.Scroll += new System.EventHandler(this.tbarVolume_Scroll);
 			// 
 			// label8
@@ -184,6 +173,7 @@
 			this.comboBox1.Name = "comboBox1";
 			this.comboBox1.Size = new System.Drawing.Size(121, 21);
 			this.comboBox1.TabIndex = 12;
+			this.comboBox1.DataSource = System.Enum.GetValues(typeof(WaveForm));
 			this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
 			// 
 			// comboBox2
@@ -194,6 +184,7 @@
 			this.comboBox2.Name = "comboBox2";
 			this.comboBox2.Size = new System.Drawing.Size(121, 21);
 			this.comboBox2.TabIndex = 13;
+			this.comboBox2.DataSource = System.Enum.GetValues(typeof(WaveForm));
 			this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
 			// 
 			// comboBox3
@@ -277,7 +268,6 @@
 			// Form1
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.CancelButton = this.buttonExit;
 			this.ClientSize = new System.Drawing.Size(1400, 500);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.label4);
@@ -298,11 +288,12 @@
 			this.Controls.Add(this.label8);
 			this.Controls.Add(this.label9);
 			this.Controls.Add(this.tbarVolume);
-			this.Controls.Add(this.buttonExit);
 			this.KeyPreview = true;
 			this.MaximizeBox = false;
 			this.Name = "Form1";
 			this.Text = "Dot Net Piano";
+			this.Activated += new System.EventHandler(this.Form1_Activated);
+			this.Deactivate += new System.EventHandler(this.Form1_Deactivate);
 			((System.ComponentModel.ISupportInitialize)(this.tbarVolume)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
@@ -313,8 +304,6 @@
 		}
 
 		#endregion
-
-		private System.Windows.Forms.Button buttonExit;
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.Label label9;
 		private System.Windows.Forms.Label label11;

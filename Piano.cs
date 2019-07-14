@@ -136,6 +136,7 @@ namespace SynthTest
 		}
 	}
 
+	[Serializable]
 	public enum WaveForm
 	{
 		Sine,

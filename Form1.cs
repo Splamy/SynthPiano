@@ -16,9 +16,10 @@ namespace SynthTest
 	public partial class Form1 : Form, IWaveSource
 	{
 		//ISoundOut waveOut = new WaveOut(32);
-		ISoundOut waveOut = new WasapiOut(true, AudioClientShareMode.Shared, 1);
+		ISoundOut waveOut = null;
 		List<PianoKey> mixfreq = new List<PianoKey>();
 		double volValue = 0.01;
+		bool interceptSlider = true;
 
 		//int[] basetable = new[] { 26200, 29400, 33000, 34900, 39200, 44000, 49525, 52400, 58800, 66000 };
 
@@ -30,9 +31,13 @@ namespace SynthTest
 			{
 				using (var mmdeviceCollection = mmdeviceEnumerator.EnumAudioEndpoints(DataFlow.Render, DeviceState.Active))
 				{
-					comboBox3.DataSource = mmdeviceCollection.ToList();
+					var mmdeviceList = mmdeviceCollection.ToList();
+					comboBox3.SelectedIndexChanged -= comboBox3_SelectedIndexChanged;
+					comboBox3.DataSource = mmdeviceList;
+					comboBox3.SelectedIndexChanged += comboBox3_SelectedIndexChanged;
 					comboBox3.DisplayMember = "FriendlyName";
 					comboBox3.ValueMember = "DeviceID";
+					comboBox3.SelectedItem = mmdeviceList.FirstOrDefault(x => x.FriendlyName == Config.Default.LastAudioDevice);
 				}
 			}
 
@@ -40,12 +45,12 @@ namespace SynthTest
 			SetStyle(ControlStyles.AllPaintingInWmPaint, true);
 			SetStyle(ControlStyles.DoubleBuffer, true);
 
-			comboBox1.DataSource = Enum.GetValues(typeof(WaveForm));
-			comboBox2.DataSource = Enum.GetValues(typeof(WaveForm));
-			comboBox1.SelectedIndex = (int)WaveForm.Sawtooth;
-			comboBox2.SelectedIndex = (int)WaveForm.Sawtooth;
+			comboBox1.SelectedItem = Config.Default.LastWave1;
+			comboBox2.SelectedItem = Config.Default.LastWave2;
 
 			tbarVolume_Scroll(tbarVolume, null);
+			piano1.Octave = Config.Default.LastOctave1;
+			piano2.Octave = Config.Default.LastOctave2;
 			numericUpDown1.Value = piano1.Octave;
 			numericUpDown2.Value = piano2.Octave;
 
@@ -59,6 +64,31 @@ namespace SynthTest
 			piano2.PianoKeyUp += k => PlayKey(k, false);
 
 			PrecalcKeys();
+
+			InterceptKeys.KeyEvent = InterceptKeys_KeyEvent;
+		}
+
+		private bool InterceptKeys_KeyEvent(bool down, Keys e)
+		{
+			const double mult = 0.003;
+
+			if (!down || !interceptSlider || (e != Keys.VolumeUp && e != Keys.VolumeDown))
+				return false;
+
+			var signedMult = e == Keys.VolumeUp ? 1 + mult : 1 - mult;
+
+			lock (mixfreq)
+			{
+				foreach (var key in mixfreq)
+				{
+					if (!key.IsWaveFading && !key.IsWaveFinalizing)
+					{
+						key.Frequency *= signedMult;
+					}
+				}
+			}
+
+			return true;
 		}
 
 		public void AutoPlay()
@@ -68,22 +98,24 @@ namespace SynthTest
 
 		private void SelectDevice(MMDevice device)
 		{
-			waveOut?.Dispose();
+			CloseDevice();
 
 			var ws = new WasapiOut(true, AudioClientShareMode.Shared, 1) { Device = device };
+
 			waveOut = ws;
 			waveOut.Initialize(this);
 			waveOut.Play();
 		}
 
-		private void buttonExit_Click(object sender, EventArgs e)
+		private void CloseDevice()
 		{
-			Close();
+			Config.Default.Save();
+			waveOut?.Dispose();
 		}
 
 		protected override void OnFormClosed(FormClosedEventArgs e)
 		{
-			waveOut.Dispose();
+			CloseDevice();
 			base.OnFormClosed(e);
 		}
 
@@ -105,23 +137,25 @@ namespace SynthTest
 
 		private void PlayKey(PianoKey key, bool on)
 		{
-			key.Selected = on;
-			bool cont = mixfreq.Contains(key);
-			if (on)
+			lock (mixfreq)
 			{
-				key.Reset();
-				if (!cont)
+				key.Selected = on;
+				bool cont = mixfreq.Contains(key);
+				if (on)
 				{
-					mixfreq.Add(key);
+					key.Reset();
+					if (!cont)
+					{
+						mixfreq.Add(key);
+					}
 				}
-			}
-			else if (!on && cont)
-			{
-				if (tbarFade.Value == 0)
-					key.FinalizeWave();
-				else
-					key.Fade();
-				// or finalize
+				else if (!on && cont)
+				{
+					if (tbarFade.Value == 0)
+						key.FinalizeWave();
+					else
+						key.Fade();
+				}
 			}
 			key.Parent.Invalidate(key.Bounds);
 		}
@@ -192,64 +226,65 @@ namespace SynthTest
 
 		public int Read(byte[] buffer, int offset, int count)
 		{
-			try
-			{
-				if (WaveFormat.BitsPerSample == 8)
-					return Read_Nbit<sbyte>(buffer, offset, count);
-				else if (WaveFormat.BitsPerSample == 16)
-					return Read_Nbit<short>(buffer, offset, count);
-				else
-					return 0;
-			}
-			catch (Exception e) { return 0; }
+			if (WaveFormat.BitsPerSample == 8)
+				return Read_Nbit<sbyte>(buffer, offset, count);
+			else if (WaveFormat.BitsPerSample == 16)
+				return Read_Nbit<short>(buffer, offset, count);
+
+			throw new NotSupportedException();
 		}
 
 		public unsafe int Read_Nbit<T>(byte[] buffer, int offset, int count) where T : unmanaged
 		{
-			int minOf = Math.Min(buffer.Length, count);
+			if (offset > buffer.Length)
+				throw new ArgumentOutOfRangeException(nameof(offset));
+			int minOf = Math.Min(buffer.Length - offset, count);
 			if (minOf % sizeof(T) != 0)
 				throw new ArgumentException();
 			minOf /= sizeof(T);
-			var mflocal = mixfreq.ToArray();
 
-			fixed (byte* bytePointer = buffer)
+			lock (mixfreq)
 			{
-				var samplePointer = (T*)bytePointer;
-
-				for (int i = 0; i < minOf; i++)
+				fixed (byte* bytePointer = buffer)
 				{
-					double value = 0;
+					var samplePointer = (T*)(bytePointer + offset);
 
-					for (int j = 0; j < mflocal.Length; j++)
+					for (int i = 0; i < minOf; i++)
 					{
-						var key = mflocal[j];
-						if (key == null) continue;
-						var addval = key.CalcWave();
+						double value = 0;
 
-						if (key.IsWaveFinalizing && key.IsFinal(addval))
+						for (int j = 0; j < mixfreq.Count; j++)
 						{
-							mixfreq.Remove(key);
-							mflocal[j] = null;
-						}
+							var key = mixfreq[j];
+							if (key == null) continue;
+							var addval = key.CalcWave();
 
-						if (key.IsWaveFading)
-						{
-							var fadeMul = key.GetFadeMul();
-							if (!key.IsWaveFinalizing && fadeMul <= 0.001)
+							if (key.IsWaveFinalizing && key.IsFinal(addval))
 							{
-								key.FinalizeWave();
+								mixfreq[j] = null;
 							}
-							value += addval * fadeMul;
-						}
-						else
-						{
-							value += addval;
-						}
-					}
 
-					int maxVal = (1 << (8 * sizeof(T) - 1)) - 1;
-					samplePointer[i] = ConvNum<T>(value * volValue * maxVal); // / Math.Sqrt(mixfreq.Count) 
+							if (key.IsWaveFading)
+							{
+								var fadeMul = key.GetFadeMul();
+								if (!key.IsWaveFinalizing && fadeMul <= 0.001)
+								{
+									key.FinalizeWave();
+								}
+								value += addval * fadeMul;
+							}
+							else
+							{
+								value += addval;
+							}
+						}
+
+						int maxVal = (1 << (8 * sizeof(T) - 1)) - 1;
+						samplePointer[i] = ConvNum<T>(value * volValue * maxVal); // / Math.Sqrt(mixfreq.Count) 
+					}
 				}
+
+				mixfreq.RemoveAll(x => x is null);
 			}
 
 			shortPos += minOf;
@@ -264,15 +299,45 @@ namespace SynthTest
 			else throw new NotSupportedException();
 		}
 
-		private void numericUpDown1_ValueChanged(object sender, EventArgs e) { piano1.Octave = (int)numericUpDown1.Value; PrecalcKeys(); }
-		private void numericUpDown2_ValueChanged(object sender, EventArgs e) { piano2.Octave = (int)numericUpDown2.Value; PrecalcKeys(); }
+		private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+		{
+			piano1.Octave = (int)numericUpDown1.Value;
+			PrecalcKeys();
+			Config.Default.LastOctave1 = piano1.Octave;
+		}
+		private void numericUpDown2_ValueChanged(object sender, EventArgs e)
+		{
+			piano2.Octave = (int)numericUpDown2.Value;
+			PrecalcKeys();
+			Config.Default.LastOctave2 = piano2.Octave;
+		}
 
-		private void comboBox1_SelectedIndexChanged(object sender, EventArgs e) { piano1.WaveForm = (WaveForm)comboBox1.SelectedItem; }
-		private void comboBox2_SelectedIndexChanged(object sender, EventArgs e) { piano2.WaveForm = (WaveForm)comboBox2.SelectedItem; }
+		private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			piano1.WaveForm = (WaveForm)comboBox1.SelectedItem;
+			Config.Default.LastWave1 = piano1.WaveForm;
+		}
+		private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			piano2.WaveForm = (WaveForm)comboBox2.SelectedItem;
+			Config.Default.LastWave2 = piano2.WaveForm;
+		}
 
 		private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
 		{
+			Config.Default.LastAudioDevice = (comboBox3.SelectedItem as MMDevice).FriendlyName;
+			Config.Default.Save();
 			SelectDevice((MMDevice)comboBox3.SelectedItem);
+		}
+
+		private void Form1_Deactivate(object sender, EventArgs e)
+		{
+			interceptSlider = false;
+		}
+
+		private void Form1_Activated(object sender, EventArgs e)
+		{
+			interceptSlider = true;
 		}
 	}
 }

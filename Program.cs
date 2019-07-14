@@ -16,7 +16,9 @@ namespace SynthTest
 			Application.SetCompatibleTextRenderingDefault(false);
 			var frm = new Form1();
 			frm.AutoPlay();
+			InterceptKeys.SetHook();
 			Application.Run(frm);
+			InterceptKeys.RemoveHook();
 		}
 	}
 }

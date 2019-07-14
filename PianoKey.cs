@@ -16,7 +16,8 @@ namespace SynthTest
 		public bool Selected { get; set; }
 		public bool Black { get; }
 
-		public double Frequency { get; }
+		public double Frequency { get; set; }
+		public double FrequencyBase { get; }
 		public int FreqPos { get; set; }
 		public int FadePos { get; set; }
 
@@ -34,6 +35,7 @@ namespace SynthTest
 		{
 			Black = black;
 			Frequency = frequency;
+			FrequencyBase = frequency;
 			Bounds = black
 				  ? new Rectangle(x, y, blackkWidth, blackkHeight)
 				  : new Rectangle(x, y, whitekWidth, whitekHeight);
@@ -59,6 +61,7 @@ namespace SynthTest
 
 		public void Reset()
 		{
+			Frequency = FrequencyBase;
 			IsWaveFading = false;
 			IsWaveFinalizing = false;
 			FreqPos = 0;
@@ -101,7 +104,7 @@ namespace SynthTest
 		}
 		public double CalcTriangle()
 		{
-			double fperbit = (Global.Bitrate / Frequency) * 2;
+			double fperbit = (Global.Bitrate / Frequency);
 			return (Math.Abs(((FreqPos++ % fperbit) / fperbit) - 0.5) * 4 - 1);
 		}
 		public double CalcSawtooth()
