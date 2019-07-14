@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
-using System.Threading;
-using System.IO;
-using System.Linq;
-using CSCore;
-using CSCore.SoundOut;
+﻿using CSCore;
 using CSCore.CoreAudioAPI;
-using System.ComponentModel.Design;
+using CSCore.SoundOut;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace SynthTest
 {
@@ -93,7 +88,8 @@ namespace SynthTest
 
 		public void AutoPlay()
 		{
-			SelectDevice((MMDevice)comboBox3.SelectedItem);
+			if (comboBox3.SelectedItem is MMDevice device)
+				SelectDevice(device);
 		}
 
 		private void SelectDevice(MMDevice device)
@@ -325,9 +321,13 @@ namespace SynthTest
 
 		private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			Config.Default.LastAudioDevice = (comboBox3.SelectedItem as MMDevice).FriendlyName;
-			Config.Default.Save();
-			SelectDevice((MMDevice)comboBox3.SelectedItem);
+			if (comboBox3.SelectedItem is MMDevice device)
+			{
+				Config.Default.LastAudioDevice = device.FriendlyName;
+				Config.Default.Save();
+
+				SelectDevice(device);
+			}
 		}
 
 		private void Form1_Deactivate(object sender, EventArgs e)
