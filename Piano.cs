@@ -8,8 +8,8 @@ namespace SynthTest
 {
 	public partial class Piano : UserControl
 	{
-		const int baseoctave = 7;
-		static readonly double[] fulltable = new double[] { 4186.01, 4434.92, 4698.63, 4978.03, 5274.04, 5587.65, 5919.91, 6271.93, 6644.88, 7040.00, 7458.62, 7902.13 };
+		private const double freq_a_4 = 440;
+		private static readonly double a_pow = Math.Pow(2, 1 / 12d);
 		static readonly bool[] keytable = new[] { false, true, false, true, false, false, true, false, true, false, true, false };
 		static readonly int[] whitemul = new[] { 0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6 };
 		const int keymulmax = 7;
@@ -44,6 +44,9 @@ namespace SynthTest
 				k.Draw(g);
 		}
 
+		private static double GetFreq(int index) => freq_a_4 * Math.Pow(a_pow, index - (8 + 12 * 4));
+		private static double GetFreq(int octave, int note) => GetFreq(octave * 12 + note);
+
 		private void RecalcKeys()
 		{
 			WhiteKeys.Clear();
@@ -53,7 +56,7 @@ namespace SynthTest
 			{
 				bool black = keytable[i % scaleLen];
 				int octave = (i / scaleLen);
-				double octavemul = Math.Pow(2, baseoctave - Octave - octave);
+				double freq = GetFreq(Octave, i);
 				if (black)
 				{
 					xpos = (i / scaleLen) * keymulmax * PianoKey.whitekWidth
@@ -63,7 +66,7 @@ namespace SynthTest
 						new PianoKey(
 							xpos,
 							0,
-							fulltable[i % scaleLen] / octavemul,
+							freq,
 							true));
 				}
 				else
@@ -74,7 +77,7 @@ namespace SynthTest
 						new PianoKey(
 							xpos,
 							0,
-							fulltable[i % scaleLen] / octavemul,
+							freq,
 							false));
 				}
 			}

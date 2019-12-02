@@ -10,13 +10,10 @@ namespace SynthTest
 {
 	public partial class Form1 : Form, IWaveSource
 	{
-		//ISoundOut waveOut = new WaveOut(32);
 		ISoundOut waveOut = null;
 		List<PianoKey> mixfreq = new List<PianoKey>();
 		double volValue = 0.01;
 		bool interceptSlider = true;
-
-		//int[] basetable = new[] { 26200, 29400, 33000, 34900, 39200, 44000, 49525, 52400, 58800, 66000 };
 
 		public Form1()
 		{
