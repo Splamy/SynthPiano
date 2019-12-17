@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Views.NodeGenWpf
+namespace NodeGen.Views
 {
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
@@ -22,7 +22,7 @@ namespace Views.NodeGenWpf
 	{
 		public MainWindow()
 		{
-			//InitializeComponent();
+			InitializeComponent();
 		}
 	}
 }

@@ -4,7 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net472</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ApplicationIcon>MadeWithCSharp.ico</ApplicationIcon>
+    <ApplicationIcon>../MadeWithCSharp.ico</ApplicationIcon>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
