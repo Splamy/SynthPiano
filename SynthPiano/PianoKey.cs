@@ -115,14 +115,14 @@ namespace SynthTest
 
 		public double CalcWave()
 		{
-			switch (Parent.WaveForm)
+			return Parent.WaveForm switch
 			{
-			case WaveForm.Sine: return CalcSine();
-			case WaveForm.Sqaure: return CalcSquare();
-			case WaveForm.Triangle: return CalcTriangle();
-			case WaveForm.Sawtooth: return CalcSawtooth();
-			default: return 0;
-			}
+				WaveForm.Sine => CalcSine(),
+				WaveForm.Sqaure => CalcSquare(),
+				WaveForm.Triangle => CalcTriangle(),
+				WaveForm.Sawtooth => CalcSawtooth(),
+				_ => 0,
+			};
 		}
 
 		public PianoKey Clone()

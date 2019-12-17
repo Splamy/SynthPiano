@@ -11,26 +11,27 @@ namespace SynthTest
 	public partial class Form1 : Form, IWaveSource
 	{
 		ISoundOut waveOut = null;
-		List<PianoKey> mixfreq = new List<PianoKey>();
+		readonly List<PianoKey> mixfreq = new List<PianoKey>();
 		double volValue = 0.01;
 		bool interceptSlider = true;
+		int fade = 0;
 
 		public Form1()
 		{
 			InitializeComponent();
+			comboBox1.DataSource = Enum.GetValues(typeof(WaveForm)); // TODO fix saving type
+			sequencer1.parent = this;
 
 			using (var mmdeviceEnumerator = new MMDeviceEnumerator())
+			using (var mmdeviceCollection = mmdeviceEnumerator.EnumAudioEndpoints(DataFlow.Render, DeviceState.Active))
 			{
-				using (var mmdeviceCollection = mmdeviceEnumerator.EnumAudioEndpoints(DataFlow.Render, DeviceState.Active))
-				{
-					var mmdeviceList = mmdeviceCollection.ToList();
-					comboBox3.SelectedIndexChanged -= comboBox3_SelectedIndexChanged;
-					comboBox3.DataSource = mmdeviceList;
-					comboBox3.SelectedIndexChanged += comboBox3_SelectedIndexChanged;
-					comboBox3.DisplayMember = "FriendlyName";
-					comboBox3.ValueMember = "DeviceID";
-					comboBox3.SelectedItem = mmdeviceList.FirstOrDefault(x => x.FriendlyName == Config.Default.LastAudioDevice);
-				}
+				var mmdeviceList = mmdeviceCollection.ToList();
+				comboBox3.SelectedIndexChanged -= comboBox3_SelectedIndexChanged;
+				comboBox3.DataSource = mmdeviceList;
+				comboBox3.SelectedIndexChanged += comboBox3_SelectedIndexChanged;
+				comboBox3.DisplayMember = "FriendlyName";
+				comboBox3.ValueMember = "DeviceID";
+				comboBox3.SelectedItem = mmdeviceList.FirstOrDefault(x => x.FriendlyName == Config.Default.LastAudioDevice);
 			}
 
 			SetStyle(ControlStyles.UserPaint, true);
@@ -38,22 +39,22 @@ namespace SynthTest
 			SetStyle(ControlStyles.DoubleBuffer, true);
 
 			comboBox1.SelectedItem = Config.Default.LastWave1;
-			comboBox2.SelectedItem = Config.Default.LastWave2;
 
 			tbarVolume_Scroll(tbarVolume, null);
 			piano1.Octave = Config.Default.LastOctave1;
-			piano2.Octave = Config.Default.LastOctave2;
 			numericUpDown1.Value = piano1.Octave;
-			numericUpDown2.Value = piano2.Octave;
 
 			piano1.PianoKeyDown += k =>
 			{
+				if (recordSeq)
+				{
+					sequencer1.SetP(k);
+					sequencer1.Invalidate();
+				}
 				PlayKey(k, true);
 				frequencyVisualizer1.PianoKey = k;
 			};
 			piano1.PianoKeyUp += k => PlayKey(k, false);
-			piano2.PianoKeyDown += k => PlayKey(k, true);
-			piano2.PianoKeyUp += k => PlayKey(k, false);
 
 			PrecalcKeys();
 
@@ -125,10 +126,11 @@ namespace SynthTest
 
 			var rawValue = ((TrackBar)sender).Value;
 			var rawMax = ((TrackBar)sender).Maximum;
+			fade = ((TrackBar)sender).Value;
 			Global.FadePower = (rawValue / (double)rawMax) * (flong - fshort) + fshort;
 		}
 
-		private void PlayKey(PianoKey key, bool on)
+		public void PlayKey(PianoKey key, bool on)
 		{
 			lock (mixfreq)
 			{
@@ -144,7 +146,7 @@ namespace SynthTest
 				}
 				else if (!on && cont)
 				{
-					if (tbarFade.Value == 0)
+					if (fade == 0)
 						key.FinalizeWave();
 					else
 						key.Fade();
@@ -298,22 +300,11 @@ namespace SynthTest
 			PrecalcKeys();
 			Config.Default.LastOctave1 = piano1.Octave;
 		}
-		private void numericUpDown2_ValueChanged(object sender, EventArgs e)
-		{
-			piano2.Octave = (int)numericUpDown2.Value;
-			PrecalcKeys();
-			Config.Default.LastOctave2 = piano2.Octave;
-		}
 
 		private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			piano1.WaveForm = (WaveForm)comboBox1.SelectedItem;
 			Config.Default.LastWave1 = piano1.WaveForm;
-		}
-		private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			piano2.WaveForm = (WaveForm)comboBox2.SelectedItem;
-			Config.Default.LastWave2 = piano2.WaveForm;
 		}
 
 		private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
@@ -335,6 +326,29 @@ namespace SynthTest
 		private void Form1_Activated(object sender, EventArgs e)
 		{
 			interceptSlider = true;
+		}
+
+
+		private void button1_Click(object sender, EventArgs e)
+		{
+			sequencer1.Start();
+		}
+
+		private void button2_Click(object sender, EventArgs e)
+		{
+			sequencer1.Stop();
+		}
+
+		bool recordSeq = false;
+
+		private void button3_Click(object sender, EventArgs e)
+		{
+			recordSeq = !recordSeq;
+		}
+
+		private void numericUpDown2_ValueChanged(object sender, EventArgs e)
+		{
+			sequencer1.SetBpm((float)numericUpDown2.Value);
 		}
 	}
 }

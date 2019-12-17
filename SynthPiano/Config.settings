@@ -8,13 +8,7 @@
     <Setting Name="LastWave1" Type="SynthTest.WaveForm" Scope="User">
       <Value Profile="(Default)">Sawtooth</Value>
     </Setting>
-    <Setting Name="LastWave2" Type="SynthTest.WaveForm" Scope="User">
-      <Value Profile="(Default)">Sawtooth</Value>
-    </Setting>
     <Setting Name="LastOctave1" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">1</Value>
-    </Setting>
-    <Setting Name="LastOctave2" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">2</Value>
     </Setting>
   </Settings>

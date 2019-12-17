@@ -27,7 +27,7 @@ namespace TS3AudioBot.Audio
 		public int BytesPerSecond { get; }
 
 		private long byteCnt;
-		private Stopwatch stopwatch;
+		private readonly Stopwatch stopwatch;
 		public TimeSpan BufferLength => CalcTime();
 
 		public PreciseAudioTimer(int sampleRate, int bits, int channel)

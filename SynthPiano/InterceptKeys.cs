@@ -8,18 +8,16 @@ class InterceptKeys
 	private const int WH_KEYBOARD_LL = 13;
 	private const int WM_KEYDOWN = 0x0100;
 	private const int WM_KEYUP = 0x0101;
-	private static LowLevelKeyboardProc _proc = HookCallback;
+	private static readonly LowLevelKeyboardProc _proc = HookCallback;
 	private static IntPtr _hookID = IntPtr.Zero;
 
 	public static Func<bool, Keys, bool> KeyEvent;
 
 	public static void SetHook()
 	{
-		using (Process curProcess = Process.GetCurrentProcess())
-		using (ProcessModule curModule = curProcess.MainModule)
-		{
-			_hookID = SetWindowsHookEx(WH_KEYBOARD_LL, _proc, GetModuleHandle(curModule.ModuleName), 0);
-		}
+		using var curProcess = Process.GetCurrentProcess();
+		using var curModule = curProcess.MainModule;
+		_hookID = SetWindowsHookEx(WH_KEYBOARD_LL, _proc, GetModuleHandle(curModule.ModuleName), 0);
 	}
 
 	public static void RemoveHook()
