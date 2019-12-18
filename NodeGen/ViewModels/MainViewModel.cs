@@ -1,4 +1,6 @@
-﻿using NodeNetwork.Toolkit.NodeList;
+﻿using DynamicData;
+using NodeGen.ViewModels.Nodes;
+using NodeNetwork.Toolkit.NodeList;
 using NodeNetwork.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -12,5 +14,13 @@ namespace NodeGen.ViewModels
 	{
 		public NetworkViewModel Network { get; } = new NetworkViewModel();
 		public NodeListViewModel NodeList { get; } = new NodeListViewModel();
+
+		public MainViewModel()
+		{
+			var eventNode = new DummyNode { CanBeRemovedByUser = false };
+			Network.Nodes.Add(eventNode);
+
+			NodeList.AddNodeType(() => new DummyNode());
+		}
 	}
 }
