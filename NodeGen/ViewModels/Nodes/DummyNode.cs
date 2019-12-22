@@ -23,28 +23,28 @@ namespace NodeGen.ViewModels.Nodes
 
 		public IntegerValueEditorViewModel OutputValueEditor { get; } = new IntegerValueEditorViewModel();
 
-		public NGInputViewModel<IInteger> Input { get; }
+		public NGInputViewModel<int?> Input { get; }
 
-		public NGOutputViewModel<IInteger> Output { get; }
+		public NGOutputViewModel<int?> Output { get; }
 
 		public DummyNode() : base(NodeType.WaveGenerator)
 		{
 			this.Name = "Dummy";
 
-			Output = new NGOutputViewModel<IInteger>(PortType.AudioSample)
+			Input = new NGInputViewModel<int?>(PortType.AudioSample)
 			{
-				Editor = OutputValueEditor,
-				Value = OutputValueEditor.ValueChanged.Select(v => new AudioSample { Value = v })
-			};
-
-			this.Outputs.Add(Output);
-
-			Input = new NGInputViewModel<IInteger>(PortType.AudioSample)
-			{
-				
+				Editor = InputValueEditor,
 			};
 
 			this.Inputs.Add(Input);
+
+			Output = new NGOutputViewModel<int?>(PortType.AudioSample)
+			{
+				Editor = OutputValueEditor,
+				Value = OutputValueEditor.ValueChanged
+			};
+
+			this.Outputs.Add(Output);
 		}
 	}
 }

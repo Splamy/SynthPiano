@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace NodeGen.ViewModels.Editors
 {
-    public class IntegerValueEditorViewModel : ValueEditorViewModel<int>
+    public class IntegerValueEditorViewModel : ValueEditorViewModel<int?>
     {
         static IntegerValueEditorViewModel()
         {

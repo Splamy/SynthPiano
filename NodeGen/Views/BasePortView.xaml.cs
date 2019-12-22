@@ -67,8 +67,8 @@ namespace NodeGen.Views
 		{
 			return type switch
 			{
-				PortType.Undef1 => (ControlTemplate)Resources[ExecutionPortTemplateKey],
 				PortType.AudioSample => (ControlTemplate)Resources[IntegerPortTemplateKey],
+				PortType.Undef1 => (ControlTemplate)Resources[ExecutionPortTemplateKey],
 				PortType.Undef2 => (ControlTemplate)Resources[StringPortTemplateKey],
 				_ => throw new Exception("Unsupported port type"),
 			};

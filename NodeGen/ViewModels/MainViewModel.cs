@@ -17,11 +17,12 @@ namespace NodeGen.ViewModels
 
 		public MainViewModel()
 		{
-			var eventNode = new DummyNode { CanBeRemovedByUser = false };
+			var eventNode = new DummyNode { };
 			Network.Nodes.Add(eventNode);
 
 			NodeList.AddNodeType(() => new DummyNode());
-			NodeList.AddNodeType(() => new WaveGenSinus());
+			NodeList.AddNodeType(() => new WaveGenSinusNode());
+			NodeList.AddNodeType(() => new DebugOutputNode());
 		}
 	}
 }

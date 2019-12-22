@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Include="Views\DebugOutputView.xaml" />
     <Page Include="Views\EmptyView.xaml" />
     <Page Include="Views\MainWindow.xaml" />
     <Page Include="Views\BaseNodeView.xaml" />

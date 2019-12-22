@@ -44,10 +44,10 @@ namespace NodeGen.Views
 		{
 			return type switch
 			{
+				NodeType.WaveGenerator => new SolidColorBrush(Color.FromRgb(0x00, 0x60, 0x0f)),
 				NodeType.Undef1 => new SolidColorBrush(Color.FromRgb(0x9b, 0x00, 0x00)),
 				NodeType.Undef2 => new SolidColorBrush(Color.FromRgb(0x49, 0x49, 0x49)),
 				NodeType.Undef3 => new SolidColorBrush(Color.FromRgb(0x00, 0x39, 0xcb)),
-				NodeType.WaveGenerator => new SolidColorBrush(Color.FromRgb(0x00, 0x60, 0x0f)),
 				_ => throw new Exception("Unsupported node type"),
 			};
 		}

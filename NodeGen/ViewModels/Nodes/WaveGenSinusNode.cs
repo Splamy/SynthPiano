@@ -11,22 +11,22 @@ using System.Threading.Tasks;
 
 namespace NodeGen.ViewModels.Nodes
 {
-	public class WaveGenSinus : BaseNodeViewModel
+	public class WaveGenSinusNode : BaseNodeViewModel
 	{
-		static WaveGenSinus()
+		static WaveGenSinusNode()
 		{
-			Splat.Locator.CurrentMutable.Register(() => new BaseNodeView(), typeof(IViewFor<WaveGenSinus>));
+			Splat.Locator.CurrentMutable.Register(() => new BaseNodeView(), typeof(IViewFor<WaveGenSinusNode>));
 		}
 
 		public IntegerValueEditorViewModel PhaseValueEditor { get; } = new IntegerValueEditorViewModel();
 		public NGInputViewModel<IInteger> Phase { get; }
 		public NGOutputViewModel<IInteger> SampleData { get; }
 
-		public WaveGenSinus() : base(NodeType.WaveGenerator)
+		public WaveGenSinusNode() : base(NodeType.WaveGenerator)
 		{
 			this.Name = "Sinus";
 
-			Phase = new NGInputViewModel<IInteger>(PortType.AudioSample)
+			Phase = new NGInputViewModel<IInteger>(PortType.Undef1)
 			{
 				Name = "Phase",
 			};
