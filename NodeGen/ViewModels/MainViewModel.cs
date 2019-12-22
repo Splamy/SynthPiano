@@ -21,6 +21,7 @@ namespace NodeGen.ViewModels
 			Network.Nodes.Add(eventNode);
 
 			NodeList.AddNodeType(() => new DummyNode());
+			NodeList.AddNodeType(() => new WaveGenSinus());
 		}
 	}
 }

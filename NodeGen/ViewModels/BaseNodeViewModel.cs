@@ -19,9 +19,9 @@ namespace NodeGen.ViewModels
 
 	public enum NodeType
 	{
-		EventNode,
-		Function,
-		FlowControl,
-		Literal
+		WaveGenerator,
+		Undef1,
+		Undef2,
+		Undef3,
 	}
 }

@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SynthPiano", "SynthPiano\SynthPiano.csproj", "{E2290EE1-C7A7-42E7-A8F7-6E37B61D3035}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeGen", "NodeGen\NodeGen.csproj", "{10845DB3-3BC2-494A-B03C-63D298F07168}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NodeGen", "NodeGen\NodeGen.csproj", "{10845DB3-3BC2-494A-B03C-63D298F07168}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
