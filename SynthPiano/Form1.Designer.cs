@@ -83,7 +83,7 @@
 			this.tbarVolume.TickFrequency = 5;
 			this.tbarVolume.TickStyle = System.Windows.Forms.TickStyle.None;
 			this.tbarVolume.Value = 10;
-			this.tbarVolume.Scroll += new System.EventHandler(this.tbarVolume_Scroll);
+			this.tbarVolume.Scroll += new System.EventHandler(this.TbarVolume_Scroll);
 			// 
 			// label8
 			// 
@@ -119,7 +119,7 @@
             0,
             0,
             0});
-			this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+			this.numericUpDown1.ValueChanged += new System.EventHandler(this.NumericUpDown1_ValueChanged);
 			// 
 			// label10
 			// 
@@ -147,7 +147,7 @@
 			this.comboBox1.Name = "comboBox1";
 			this.comboBox1.Size = new System.Drawing.Size(121, 21);
 			this.comboBox1.TabIndex = 12;
-			this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+			this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.ComboBox1_SelectedIndexChanged);
 			// 
 			// comboBox3
 			// 
@@ -157,7 +157,7 @@
 			this.comboBox3.Name = "comboBox3";
 			this.comboBox3.Size = new System.Drawing.Size(236, 21);
 			this.comboBox3.TabIndex = 15;
-			this.comboBox3.SelectedIndexChanged += new System.EventHandler(this.comboBox3_SelectedIndexChanged);
+			this.comboBox3.SelectedIndexChanged += new System.EventHandler(this.ComboBox3_SelectedIndexChanged);
 			// 
 			// label3
 			// 
@@ -233,7 +233,7 @@
 			this.button1.TabIndex = 22;
 			this.button1.Text = "button1";
 			this.button1.UseVisualStyleBackColor = true;
-			this.button1.Click += new System.EventHandler(this.button1_Click);
+			this.button1.Click += new System.EventHandler(this.Button1_Click);
 			// 
 			// button2
 			// 
@@ -243,7 +243,7 @@
 			this.button2.TabIndex = 23;
 			this.button2.Text = "button2";
 			this.button2.UseVisualStyleBackColor = true;
-			this.button2.Click += new System.EventHandler(this.button2_Click);
+			this.button2.Click += new System.EventHandler(this.Button2_Click);
 			// 
 			// button3
 			// 
@@ -253,7 +253,7 @@
 			this.button3.TabIndex = 24;
 			this.button3.Text = "button3";
 			this.button3.UseVisualStyleBackColor = true;
-			this.button3.Click += new System.EventHandler(this.button3_Click);
+			this.button3.Click += new System.EventHandler(this.Button3_Click);
 			// 
 			// numericUpDown2
 			// 
@@ -276,7 +276,7 @@
             0,
             0,
             0});
-			this.numericUpDown2.ValueChanged += new System.EventHandler(this.numericUpDown2_ValueChanged);
+			this.numericUpDown2.ValueChanged += new System.EventHandler(this.NumericUpDown2_ValueChanged);
 			// 
 			// Form1
 			// 

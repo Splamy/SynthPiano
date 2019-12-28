@@ -26,9 +26,9 @@ namespace SynthTest
 			using (var mmdeviceCollection = mmdeviceEnumerator.EnumAudioEndpoints(DataFlow.Render, DeviceState.Active))
 			{
 				var mmdeviceList = mmdeviceCollection.ToList();
-				comboBox3.SelectedIndexChanged -= comboBox3_SelectedIndexChanged;
+				comboBox3.SelectedIndexChanged -= ComboBox3_SelectedIndexChanged;
 				comboBox3.DataSource = mmdeviceList;
-				comboBox3.SelectedIndexChanged += comboBox3_SelectedIndexChanged;
+				comboBox3.SelectedIndexChanged += ComboBox3_SelectedIndexChanged;
 				comboBox3.DisplayMember = "FriendlyName";
 				comboBox3.ValueMember = "DeviceID";
 				comboBox3.SelectedItem = mmdeviceList.FirstOrDefault(x => x.FriendlyName == Config.Default.LastAudioDevice);
@@ -40,7 +40,7 @@ namespace SynthTest
 
 			comboBox1.SelectedItem = Config.Default.LastWave1;
 
-			tbarVolume_Scroll(tbarVolume, null);
+			TbarVolume_Scroll(tbarVolume, null);
 			piano1.Octave = Config.Default.LastOctave1;
 			numericUpDown1.Value = piano1.Octave;
 
@@ -113,7 +113,7 @@ namespace SynthTest
 			base.OnFormClosed(e);
 		}
 
-		private void tbarVolume_Scroll(object sender, EventArgs e)
+		private void TbarVolume_Scroll(object sender, EventArgs e)
 		{
 			textVolume.Text = ((TrackBar)sender).Value.ToString();
 			volValue = ((TrackBar)sender).Value / 100d;
@@ -294,20 +294,20 @@ namespace SynthTest
 			else throw new NotSupportedException();
 		}
 
-		private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+		private void NumericUpDown1_ValueChanged(object sender, EventArgs e)
 		{
 			piano1.Octave = (int)numericUpDown1.Value;
 			PrecalcKeys();
 			Config.Default.LastOctave1 = piano1.Octave;
 		}
 
-		private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+		private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			piano1.WaveForm = (WaveForm)comboBox1.SelectedItem;
 			Config.Default.LastWave1 = piano1.WaveForm;
 		}
 
-		private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
+		private void ComboBox3_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (comboBox3.SelectedItem is MMDevice device)
 			{
@@ -329,24 +329,24 @@ namespace SynthTest
 		}
 
 
-		private void button1_Click(object sender, EventArgs e)
+		private void Button1_Click(object sender, EventArgs e)
 		{
 			sequencer1.Start();
 		}
 
-		private void button2_Click(object sender, EventArgs e)
+		private void Button2_Click(object sender, EventArgs e)
 		{
 			sequencer1.Stop();
 		}
 
 		bool recordSeq = false;
 
-		private void button3_Click(object sender, EventArgs e)
+		private void Button3_Click(object sender, EventArgs e)
 		{
 			recordSeq = !recordSeq;
 		}
 
-		private void numericUpDown2_ValueChanged(object sender, EventArgs e)
+		private void NumericUpDown2_ValueChanged(object sender, EventArgs e)
 		{
 			sequencer1.SetBpm((float)numericUpDown2.Value);
 		}

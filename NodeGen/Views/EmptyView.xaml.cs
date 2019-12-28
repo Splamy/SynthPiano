@@ -1,10 +1,6 @@
 ﻿using NodeGen.ViewModels;
-using NodeNetwork.Views;
 using ReactiveUI;
-using System;
-using System.Reactive.Disposables;
 using System.Windows;
-using System.Windows.Media;
 
 
 namespace NodeGen.Views

@@ -6,7 +6,8 @@
 		xmlns:nnviews="clr-namespace:NodeNetwork.Views;assembly=NodeNetwork"
 		xmlns:nntList="clr-namespace:NodeNetwork.Toolkit.NodeList;assembly=NodeNetworkToolkit"
 		xmlns:views="clr-namespace:NodeGen.Views"
-		mc:Ignorable="d"
+        xmlns:we="clr-namespace:NodeGen.Views.WaveEngine"
+        mc:Ignorable="d"
 		Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -26,14 +27,7 @@
         <nnviews:NetworkView x:Name="network" Grid.Column="2"/>
         <GridSplitter Grid.Column="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
         <Grid Grid.Column="4">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="5"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <!--<views1:CodePreviewView Grid.Row="0" x:Name="codePreviewView"/>-->
-            <GridSplitter Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
-            <!--<views1:CodeSimView Grid.Row="2" x:Name="codeSimView"/>-->
+            <we:WaveEngineView />
         </Grid>
     </Grid>
 </Window>

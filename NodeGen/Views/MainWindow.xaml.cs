@@ -1,20 +1,8 @@
 ﻿using NodeGen.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using ReactiveUI;
+using System;
 using System.Reactive.Disposables;
+using System.Windows;
 
 namespace NodeGen.Views
 {
@@ -44,10 +32,13 @@ namespace NodeGen.Views
 		{
 			InitializeComponent();
 
-			this.WhenActivated(d =>
+			ViewModel = new MainViewModel();
+
+			var disposableModel = this.WhenActivated(d =>
 			{
 				this.OneWayBind(ViewModel, vm => vm.Network, v => v.network.ViewModel).DisposeWith(d);
 				this.OneWayBind(ViewModel, vm => vm.NodeList, v => v.nodeList.ViewModel).DisposeWith(d);
+				ViewModel.Engine.DisposeWith(d);
 				//this.OneWayBind(ViewModel, vm => vm.CodePreview, v => v.codePreviewView.ViewModel).DisposeWith(d);
 				//this.OneWayBind(ViewModel, vm => vm.CodeSim, v => v.codeSimView.ViewModel).DisposeWith(d);
 
@@ -64,7 +55,7 @@ namespace NodeGen.Views
 				//	.BindTo(this, v => v.stopAutoLayoutLiveButton.Visibility);
 			});
 
-			this.ViewModel = new MainViewModel();
+			Closed += (s, e) => disposableModel.Dispose();
 		}
 	}
 }

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace NodeGen.Model
 {
-	public class AudioSample : IInteger
+	public class DataFloat : IFloat
 	{
-		public int Value { get; set; }
+		public float Value { get; set; }
 	}
 }

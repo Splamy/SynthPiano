@@ -8,22 +8,22 @@ using System.Windows.Media;
 
 namespace NodeGen.Views
 {
-	public partial class BaseNodeView : IViewFor<BaseNodeViewModel>
+	public partial class BaseNodeView : IViewFor<NGNodeViewModel>
 	{
 		#region ViewModel
 		public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(nameof(ViewModel),
-			typeof(BaseNodeViewModel), typeof(BaseNodeView), new PropertyMetadata(null));
+			typeof(NGNodeViewModel), typeof(BaseNodeView), new PropertyMetadata(null));
 
-		public BaseNodeViewModel ViewModel
+		public NGNodeViewModel ViewModel
 		{
-			get => (BaseNodeViewModel)GetValue(ViewModelProperty);
+			get => (NGNodeViewModel)GetValue(ViewModelProperty);
 			set => SetValue(ViewModelProperty, value);
 		}
 
 		object IViewFor.ViewModel
 		{
 			get => ViewModel;
-			set => ViewModel = (BaseNodeViewModel)value;
+			set => ViewModel = (NGNodeViewModel)value;
 		}
 		#endregion
 
@@ -33,20 +33,20 @@ namespace NodeGen.Views
 
 			this.WhenActivated(d =>
 			{
-				NodeView.ViewModel = this.ViewModel;
+				NodeView.ViewModel = ViewModel;
 				Disposable.Create(() => NodeView.ViewModel = null).DisposeWith(d);
 
 				this.OneWayBind(ViewModel, vm => vm.NodeType, v => v.NodeView.Background, ConvertNodeTypeToBrush).DisposeWith(d);
 			});
 		}
 
-		private Brush ConvertNodeTypeToBrush(NodeType type)
+		public static Brush ConvertNodeTypeToBrush(NodeType type)
 		{
 			return type switch
 			{
-				NodeType.WaveGenerator => new SolidColorBrush(Color.FromRgb(0x00, 0x60, 0x0f)),
-				NodeType.Undef1 => new SolidColorBrush(Color.FromRgb(0x9b, 0x00, 0x00)),
-				NodeType.Undef2 => new SolidColorBrush(Color.FromRgb(0x49, 0x49, 0x49)),
+				NodeType.WaveSource => new SolidColorBrush(Color.FromRgb(0x00, 0x60, 0x0f)),
+				NodeType.WaveProcessor => new SolidColorBrush(Color.FromRgb(0x9b, 0x00, 0x00)),
+				NodeType.WaveSink => new SolidColorBrush(Color.FromRgb(0x49, 0x49, 0x49)),
 				NodeType.Undef3 => new SolidColorBrush(Color.FromRgb(0x00, 0x39, 0xcb)),
 				_ => throw new Exception("Unsupported node type"),
 			};

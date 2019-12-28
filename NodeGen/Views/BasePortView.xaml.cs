@@ -1,42 +1,32 @@
 ﻿using NodeGen.ViewModels;
 using ReactiveUI;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Disposables;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace NodeGen.Views
 {
 	/// <summary>
 	/// Interaction logic for BasePortView.xaml
 	/// </summary>
-	public partial class BasePortView : IViewFor<BasePortViewModel>
+	public partial class BasePortView : IViewFor<NGPortViewModel>
 	{
 		#region ViewModel
 		public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(nameof(ViewModel),
-			typeof(BasePortViewModel), typeof(BasePortView), new PropertyMetadata(null));
+			typeof(NGPortViewModel), typeof(BasePortView), new PropertyMetadata(null));
 
-		public BasePortViewModel ViewModel
+		public NGPortViewModel ViewModel
 		{
-			get => (BasePortViewModel)GetValue(ViewModelProperty);
+			get => (NGPortViewModel)GetValue(ViewModelProperty);
 			set => SetValue(ViewModelProperty, value);
 		}
 
 		object IViewFor.ViewModel
 		{
 			get => ViewModel;
-			set => ViewModel = (BasePortViewModel)value;
+			set => ViewModel = (NGPortViewModel)value;
 		}
 		#endregion
 
@@ -67,9 +57,9 @@ namespace NodeGen.Views
 		{
 			return type switch
 			{
-				PortType.AudioSample => (ControlTemplate)Resources[IntegerPortTemplateKey],
-				PortType.Undef1 => (ControlTemplate)Resources[ExecutionPortTemplateKey],
-				PortType.Undef2 => (ControlTemplate)Resources[StringPortTemplateKey],
+				PortType.Wave => (ControlTemplate)Resources[ExecutionPortTemplateKey],
+				PortType.Int => (ControlTemplate)Resources[IntegerPortTemplateKey],
+				PortType.Float => (ControlTemplate)Resources[StringPortTemplateKey],
 				_ => throw new Exception("Unsupported port type"),
 			};
 		}
