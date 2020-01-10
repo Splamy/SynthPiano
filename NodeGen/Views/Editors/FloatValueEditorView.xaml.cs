@@ -1,9 +1,9 @@
 ﻿using NodeGen.Model;
 using NodeGen.ViewModels.Editors;
-using NodeGen.ViewModels.Nodes;
 using ReactiveUI;
-using System.Reactive.Disposables;
+using System;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 
 namespace NodeGen.Views.Editors
 {
@@ -30,9 +30,17 @@ namespace NodeGen.Views.Editors
 		{
 			InitializeComponent();
 
-			this.WhenActivated(d => {
+			this.WhenActivated(d =>
+			{
 				this.Bind(ViewModel, vm => vm.Value, v => v.UpDown.Value, x => x.Value, x => new DataFloat() { Value = x ?? 0 });
 			});
+		}
+
+		private void OnDragKnob(object sender, DragDeltaEventArgs e)
+		{
+			e.Handled = true;
+			float scale = (float)Math.Log10(ViewModel.Value.Value);
+
 		}
 	}
 }

@@ -7,5 +7,17 @@
              xmlns:views="clr-namespace:NodeNetwork.Views;assembly=NodeNetwork"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <xctk:SingleUpDown Name="UpDown"/>
+    <StackPanel Orientation="Horizontal">
+        <xctk:SingleUpDown Name="UpDown"/>
+        <Thumb DragDelta="OnDragKnob">
+            <Thumb.Template>
+                <ControlTemplate>
+                    <Canvas x:Name="TurnKnob" Width="20" Height="20">
+                        <Ellipse Width="20" Height="20" Fill="DarkGray" Stroke="Gray" StrokeThickness="2"></Ellipse>
+                        <Line X1="10" Y1="0" X2="10" Y2="10" Stroke="Black" StrokeThickness="2"></Line>
+                    </Canvas>
+                </ControlTemplate>
+            </Thumb.Template>
+        </Thumb>
+    </StackPanel>
 </UserControl>

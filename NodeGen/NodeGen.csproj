@@ -15,11 +15,11 @@
 
   <ItemGroup>
     <PackageReference Include="CSCore" Version="1.2.1.2" />
-    <PackageReference Include="DynamicData" Version="6.14.1" />
+    <PackageReference Include="DynamicData" Version="6.13.9" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="3.7.0" />
     <PackageReference Include="NodeNetwork" Version="4.1.1" />
     <PackageReference Include="NodeNetworkToolkit" Version="4.1.1" />
-    <PackageReference Include="ReactiveUI" Version="11.0.1" />
+    <PackageReference Include="ReactiveUI.WPF" Version="10.3.6" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,16 +27,37 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Include="Views\Editors\FloatValueEditorView.xaml" />
-    <Page Include="Views\EmptyView.xaml" />
-    <Page Include="Views\MainWindow.xaml" />
-    <Page Include="Views\BaseNodeView.xaml" />
-    <Page Include="Views\BasePortView.xaml" />
-    <Page Include="Views\Editors\IntegerValueEditorView.xaml" />
+    <Page Include="Views\EmptyView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BaseNodeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BasePortView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Editors\FloatValueEditorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Editors\IntegerValueEditorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WaveEngine\CurveSegView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\WaveEngine\WaveEngineView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Editors\WaveEngineEditorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WaveEngine\CurvePointView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

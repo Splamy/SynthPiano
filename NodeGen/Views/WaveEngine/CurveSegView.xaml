@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="NodeGen.Views.WaveEngine.CurveSegView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:views="clr-namespace:NodeNetwork.Views;assembly=NodeNetwork"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Path x:Name="curvePath" Stroke="Orange" StrokeThickness="2">
+        <Path.Data>
+            <PathGeometry>
+                <PathFigure StartPoint="{Binding StartPoint.Position}">
+                    <BezierSegment
+                        Point1="{Binding StartPoint.HandleRightView}"
+                        Point2="{Binding EndPoint.HandleLeftView}"
+                        Point3="{Binding EndPoint.Position}" />
+                </PathFigure>
+            </PathGeometry>
+        </Path.Data>
+    </Path>
+</UserControl>
