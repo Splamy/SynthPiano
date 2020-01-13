@@ -8,8 +8,8 @@ namespace NodeGen.Model.Nodes
 {
 	public class WaveSinusSource : WaveBaseSpan
 	{
-		public IFloat? Phase { get; set; }
-		public IFloat? Frequency { get; set; }
+		public float? Phase { get; set; }
+		public float? Frequency { get; set; }
 
 		public override void Read(Span<float> data)
 		{
@@ -17,8 +17,8 @@ namespace NodeGen.Model.Nodes
 			if (Frequency is null)
 				return;
 			// Read
-			var phase = Phase?.Value ?? 0;
-			var frequency = Frequency?.Value ?? 0;
+			var phase = Phase ?? 0;
+			var frequency = Frequency ?? 0;
 			if (frequency == 0)
 				return;
 			// Process
@@ -30,7 +30,7 @@ namespace NodeGen.Model.Nodes
 			}
 			// WriteBack
 			if (Phase != null)
-				Phase.Value = phase;
+				Phase = phase;
 		}
 	}
 }

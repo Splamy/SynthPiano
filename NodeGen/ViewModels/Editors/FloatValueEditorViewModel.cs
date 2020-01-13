@@ -5,7 +5,7 @@ using ReactiveUI;
 
 namespace NodeGen.ViewModels.Editors
 {
-	public class FloatValueEditorViewModel : ValueEditorViewModel<IFloat>
+	public class FloatValueEditorViewModel : ValueEditorViewModel<float?>
 	{
 		static FloatValueEditorViewModel()
 		{
@@ -14,8 +14,14 @@ namespace NodeGen.ViewModels.Editors
 
 		public FloatValueEditorViewModel(float def = 0)
 		{
-			Value ??= new DataFloat();
-			Value.Value = def;
+			Value = def;
+		}
+
+		private double knobRotation;
+		public double KnobRotation
+		{
+			get => knobRotation;
+			set => this.RaiseAndSetIfChanged(ref knobRotation, value);
 		}
 	}
 }

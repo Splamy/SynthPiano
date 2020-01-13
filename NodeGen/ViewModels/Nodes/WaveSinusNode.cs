@@ -15,8 +15,8 @@ namespace NodeGen.ViewModels.Nodes
 		private readonly WaveSinusSource source = new WaveSinusSource();
 
 		public IntegerValueEditorViewModel PhaseValueEditor { get; } = new IntegerValueEditorViewModel();
-		public NGNodeInputViewModel<IFloat?> Phase { get; } = new NGNodeInputViewModel<IFloat?>(PortType.Float) { Name = "Phase", };
-		public NGNodeInputViewModel<IFloat?> Frequency { get; } = new NGNodeInputViewModel<IFloat?>(PortType.Float) { Name = "Frequency", };
+		public NGNodeInputViewModel<float?> Phase { get; } = new NGNodeInputViewModel<float?>(PortType.Float) { Name = "Phase", };
+		public NGNodeInputViewModel<float?> Frequency { get; } = new NGNodeInputViewModel<float?>(PortType.Float) { Name = "Frequency", };
 		public NGNodeOutputViewModel<ISampleSource?> Wave { get; } = new NGNodeOutputViewModel<ISampleSource?>(PortType.Wave) { Name = "Wave", };
 
 		public WaveSinusNode() : base(NodeType.WaveSource)

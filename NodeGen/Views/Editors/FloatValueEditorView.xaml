@@ -8,16 +8,19 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <StackPanel Orientation="Horizontal">
-        <xctk:SingleUpDown Name="UpDown"/>
-        <Thumb DragDelta="OnDragKnob">
+        <Thumb x:Name="TurnKnob" DragDelta="OnDragKnob" DragStarted="OnDragStartKnob" Width="20" Height="20">
             <Thumb.Template>
                 <ControlTemplate>
-                    <Canvas x:Name="TurnKnob" Width="20" Height="20">
+                    <Canvas Width="20" Height="20" RenderTransformOrigin="0.5,0.5">
+                        <Canvas.RenderTransform>
+                            <RotateTransform x:Name="TurnKnobTrans" CenterX="0" CenterY="0" Angle="{Binding KnobRotation}" />
+                        </Canvas.RenderTransform>
                         <Ellipse Width="20" Height="20" Fill="DarkGray" Stroke="Gray" StrokeThickness="2"></Ellipse>
                         <Line X1="10" Y1="0" X2="10" Y2="10" Stroke="Black" StrokeThickness="2"></Line>
                     </Canvas>
                 </ControlTemplate>
             </Thumb.Template>
         </Thumb>
+        <xctk:SingleUpDown Name="UpDown"/>
     </StackPanel>
 </UserControl>
