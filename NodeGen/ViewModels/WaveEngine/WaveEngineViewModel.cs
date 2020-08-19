@@ -31,6 +31,8 @@ namespace NodeGen.ViewModels.WaveEngine
 				.AutoRefresh(node => node.IsSelected)
 				.Filter(node => node.IsSelected)
 				.AsObservableList();
+
+
 		}
 
 		public void ClearSelection()
